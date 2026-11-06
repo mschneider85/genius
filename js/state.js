@@ -1,4 +1,4 @@
-const KEY = 'genius-sternenakademie-v1';
+const KEY = 'genius-v1';
 export const MAX_LEVEL = 40;
 
 const DEFAULT = {

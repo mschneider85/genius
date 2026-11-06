@@ -1,5 +1,5 @@
 // Bei jeder Veröffentlichung VERSION erhöhen, damit alte Caches gelöscht werden.
-const VERSION = 'genius-v9';
+const VERSION = 'genius-v10';
 const ASSETS = [
   './',
   './index.html',
