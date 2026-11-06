@@ -11,6 +11,18 @@ const ACC = 950;
 const MAX_SPEED = 430;
 const LAND_TIME = 0.75;
 const TAKEOFF_TIME = 0.9;
+
+/** Short control lines for the first flight, depending on the input devices present. */
+function controlHints() {
+  const touch = matchMedia('(any-pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+  const mouse = matchMedia('(any-pointer: fine)').matches;
+  const lines = touch
+    ? ['Finger auf den Bildschirm halten = fliegen', 'Planet antippen = Autopilot', 'Zum Landen den Knopf unten antippen']
+    : ['Maustaste halten = fliegen', 'Planet anklicken = Autopilot', 'Zum Landen den Knopf unten anklicken'];
+  // A hardware keyboard can't be detected: offer the keys when a mouse/trackpad exists (desktop, iPad with keyboard case).
+  if (mouse) lines.push('Pfeiltasten = fliegen · Enter = landen');
+  return lines;
+}
 const TEX_SCALE = 2; // planet/label textures are drawn at 2× world size for crisp zoom
 
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -149,9 +161,8 @@ export function createWorld(root, cfg) {
   let destroyed = false;
   const minimap = h('canvas', { class: 'minimap', 'aria-hidden': 'true' });
   const prompt = h('button', { type: 'button', class: 'land-prompt' });
-  const hint = cfg.tutorial
-    ? h('div', { class: 'world-hint' }, 'Gedrückt halten = fliegen', h('br'), 'Planet antippen = Autopilot', h('span', { class: 'kbd' }, h('br'), 'Pfeiltasten / WASD · Enter = landen'))
-    : null;
+  // Controls hint matching the device: touch (iPad), mouse, and/or a hardware keyboard.
+  const hint = cfg.tutorial ? h('div', { class: 'world-hint' }, controlHints().flatMap((line, i) => (i ? [h('br'), line] : [line]))) : null;
   root.append(canvas, minimap, prompt, hint);
   // iPad Safari: pinch gestures would zoom the whole page instead of steering.
   root.addEventListener('gesturestart', (e) => e.preventDefault());

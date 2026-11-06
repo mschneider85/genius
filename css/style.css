@@ -490,7 +490,6 @@ body[data-scene='world'] #stars { display: none; }
   background: rgba(5, 8, 25, 0.78); border: 1px solid var(--border); padding: 10px 16px; border-radius: 16px; font-weight: 800; line-height: 1.7; font-size: 0.95rem;
   transition: opacity 1.2s;
 }
-@media (pointer: coarse) { .world-hint .kbd { display: none; } }
 .world-hint.gone { opacity: 0; }
 
 /* Planetenoberfläche: riesiger Planet am Horizont */
