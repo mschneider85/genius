@@ -187,11 +187,12 @@ function renderWelcome() {
 
 /* ---------- Weltall ---------- */
 
-// Positions in Numeria; Infinitas mirrors them horizontally.
+// Positions in Numeria (world 7200×5400): planets in the middle, the wide outer ring is free space to explore
+// (asteroid fields; treasure chests only hide out there). Infinitas mirrors them horizontally.
 const LAYOUT = {
-  station: [1600, 1200], pyramid: [1150, 930], sequence: [2080, 900], asteroid: [1620, 1680], scale: [680, 1350],
-  binary: [2520, 1480], magic: [1000, 480], fraction: [2350, 430], builder: [480, 1900], duel: [2760, 2010],
-  fortress: [2900, 330], gate: [330, 330],
+  station: [3600, 2700], pyramid: [2970, 2322], sequence: [4272, 2280], asteroid: [3628, 3372], scale: [2312, 2910],
+  binary: [4888, 3092], magic: [2760, 1692], fraction: [4650, 1622], builder: [2032, 3680], duel: [5224, 3834],
+  fortress: [5420, 1482], gate: [1822, 1482],
 };
 const posOf = (id) => {
   const [x, y] = LAYOUT[id];
@@ -272,8 +273,9 @@ const hudBtn = (icon, label, onClick) => h('button', { type: 'button', class: 'h
 
 /* ---------- Erkundung: Sternensplitter & Schatztruhen ---------- */
 
-const SHARDS = 26;
-const CHESTS = 3;
+const SHARDS = 80;
+const CHESTS = 5;
+const OUTER = 2400; // chests lie at least this far from the station: rewards for exploring the edges
 
 /** Today's pickups for the current galaxy (same layout all day, collected ones removed). */
 function worldPickups(objects) {
@@ -281,12 +283,13 @@ function worldPickups(objects) {
   const r = seeded(today() + ':' + state.galaxy);
   const out = [];
   const free = (x, y) => objects.every((o) => Math.hypot(o.x - x, o.y - y) > o.r + 150) && out.every((p) => Math.hypot(p.x - x, p.y - y) > 120);
+  const outer = (x, y) => Math.hypot(x - WORLD_W / 2, y - WORLD_H / 2) > OUTER;
   for (let i = 0; i < SHARDS + CHESTS; i++) {
     const kind = i < SHARDS ? 'shard' : 'chest';
-    for (let t = 0; t < 40; t++) {
+    for (let t = 0; t < 60; t++) {
       const x = 120 + r() * (WORLD_W - 240);
       const y = 120 + r() * (WORLD_H - 240);
-      if (free(x, y)) { out.push({ id: `${state.galaxy}:${kind}${i}`, kind, x, y }); break; }
+      if (free(x, y) && (kind === 'shard' || outer(x, y))) { out.push({ id: `${state.galaxy}:${kind}${i}`, kind, x, y }); break; }
     }
   }
   return out.filter((p) => !state.world.taken.includes(p.id));

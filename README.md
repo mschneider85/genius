@@ -56,7 +56,7 @@ Es gibt keinen Zeitdruck und keine Strafe, aber drei gestufte Tipps von Professo
 - **Duell mit Lebensbalken:** In jeder Mission stehen sich das Kind (mit Avatar) und der Widersacher gegenüber. Jede falsche Antwort kostet eigene Lebensenergie, jedes gelöste Rätsel schwächt den Gegner. Ist die Energie leer, ist die Mission verloren – mit „Nochmal versuchen“ geht es sofort mit voller Energie weiter.
 - **Combo:** Fehlerfreie Rätsel in Folge zählen eine Combo hoch (Bonus-Kristalle, im Bosskampf Extra-Schaden).
 - **Tagesaufträge & Abzeichen:** täglich 3 neue Ziele (+40 💎, alle drei: +100 💎 und ein Ei-Splitter) und 22 langfristige Abzeichen (`js/progress.js`).
-- **Erkundung:** Im All liegen täglich neue 💠 Sternensplitter und 3 versteckte Schatztruhen mit „Rechen-Schloss“ (3 Kopfrechenaufgaben).
+- **Erkundung:** Das All ist 7200 × 5400 groß; die Planeten liegen in der Mitte, außen gibt es viel Raum mit Asteroidenfeldern. Täglich liegen dort 80 neue 💠 Sternensplitter und 5 versteckte Schatztruhen mit „Rechen-Schloss“ (3 Kopfrechenaufgaben) – die Truhen nur im Außenring, damit sich Erkunden lohnt.
 - **Schiffs-Module (Werft):** Schutzschild (mehr Energie/Herzen), Zeitkristall (Boss lädt langsamer), Laser-Verstärker, Turbo-Triebwerk, Schatz-Scanner, Splitter-Magnet – Kristalle haben dadurch spielerischen Nutzen.
 
 ## Geräte

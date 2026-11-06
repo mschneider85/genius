@@ -1,11 +1,11 @@
 // Freie Weltraum-Welt: Raumschiff steuern, Planeten anfliegen, landen, Kometen fangen.
 // Gezeichnet wird mit WebGL (js/gl.js); alle Grafiken werden einmal als Texturen vorgezeichnet.
-import { h } from './util.js';
+import { h, seeded } from './util.js';
 import { createRenderer } from './gl.js';
 import { lowPower, reportSlow } from './perf.js';
 
-export const WORLD_W = 3200;
-export const WORLD_H = 2400;
+export const WORLD_W = 7200;
+export const WORLD_H = 5400;
 import { paintPlanet, paintShip, paintComet, paintShard, paintChest, paintBeacon, paintStation, paintNebula, cachedArt, idleQueue, PLANET_TYPES } from './art.js';
 const ACC = 950;
 const MAX_SPEED = 430;
@@ -224,8 +224,21 @@ export function createWorld(root, cfg) {
   const starLayers = [0.15, 0.35, 0.6].map((p, i) => ({
     p, stars: Array.from({ length: 90 - i * 20 }, () => ({ u: Math.random(), v: Math.random(), r: rand(1.2, 2.4 + i * 1.2), tw: rand(0, 6) })),
   }));
-  const nebulae = Array.from({ length: 7 }, (_, i) => ({ x: rand(0, WORLD_W), y: rand(0, WORLD_H), r: rand(450, 850), c: hsl(rand(200, 330), 80, 55), v: i % 3, rot: rand(0, 6) }));
-  const rocks = Array.from({ length: 28 }, () => ({ x: rand(0, WORLD_W), y: rand(0, WORLD_H), r: rand(6, 18), vx: rand(-12, 12), vy: rand(-12, 12), rot: rand(0, 6), vr: rand(-0.5, 0.5) }));
+  const nebulae = Array.from({ length: 30 }, (_, i) => ({ x: rand(0, WORLD_W), y: rand(0, WORLD_H), r: rand(450, 850), c: hsl(rand(200, 330), 80, 55), v: i % 3, rot: rand(0, 6) }));
+  const rock = (x, y, v) => ({ x, y, r: rand(6, 18), vx: rand(-v, v), vy: rand(-v, v), rot: rand(0, 6), vr: rand(-0.5, 0.5) });
+  // scattered rocks + dense asteroid fields in the outer ring (same places every visit of a galaxy)
+  const rocks = Array.from({ length: 50 }, () => rock(rand(0, WORLD_W), rand(0, WORLD_H), 12));
+  const fr = seeded('fields:' + (cfg.galaxy || 0));
+  for (let f = 0; f < 5; f++) {
+    const a = (f / 5) * Math.PI * 2 + fr() * 0.8;
+    const cx = clamp(WORLD_W / 2 + Math.cos(a) * WORLD_W * 0.38, 500, WORLD_W - 500);
+    const cy = clamp(WORLD_H / 2 + Math.sin(a) * WORLD_H * 0.38, 500, WORLD_H - 500);
+    for (let k = 0; k < 26; k++) {
+      const d = Math.sqrt(fr()) * 480;
+      const b = fr() * Math.PI * 2;
+      rocks.push(rock(cx + Math.cos(b) * d, cy + Math.sin(b) * d * 0.7, 3));
+    }
+  }
 
   let comet = null;
   let pickups = (cfg.pickups || []).map((p) => ({ ...p, ph: rand(0, 6) }));
@@ -433,10 +446,15 @@ export function createWorld(root, cfg) {
         spr(T.dot, x, y, st.r * 2 * q, st.r * 2 * q, 0, 1, 1, 1, a);
       }
     }
+    const inView = (x, y, rad) => x > -rad && y > -rad && x < W * q + rad && y < H * q + rad;
     for (const n of nebulae) {
+      const x = sx(n.x);
+      const y = sy(n.y);
+      const rad = n.r * 1.2 * s;
+      if (!inView(x, y, rad)) continue;
       const nt = nebulaTex[n.v];
-      if (nt) spr(nt, sx(n.x), sy(n.y), n.r * 2.4 * s, n.r * 2.4 * s, n.rot, 1, 1, 1, 0.55);
-      else spr(T.glow, sx(n.x), sy(n.y), n.r * 2 * s, n.r * 2 * s, 0, n.c[0], n.c[1], n.c[2], 0.22);
+      if (nt) spr(nt, x, y, n.r * 2.4 * s, n.r * 2.4 * s, n.rot, 1, 1, 1, 0.55);
+      else spr(T.glow, x, y, n.r * 2 * s, n.r * 2 * s, 0, n.c[0], n.c[1], n.c[2], 0.22);
     }
 
     // world border
@@ -447,7 +465,11 @@ export function createWorld(root, cfg) {
     spr(T.white, bx0, (by0 + by1) / 2, lw, by1 - by0, 0, 0.48, 0.84, 1, 0.18);
     spr(T.white, bx1, (by0 + by1) / 2, lw, by1 - by0, 0, 0.48, 0.84, 1, 0.18);
 
-    for (const r of rocks) spr(art.comet, sx(r.x), sy(r.y), r.r * 2.4 * s, r.r * 2 * s, r.rot, 0.62, 0.52, 0.45, 1);
+    for (const r of rocks) {
+      const x = sx(r.x);
+      const y = sy(r.y);
+      if (inView(x, y, 40 * s)) spr(art.comet, x, y, r.r * 2.4 * s, r.r * 2 * s, r.rot, 0.62, 0.52, 0.45, 1);
+    }
 
     for (const o of objects) {
       const x = sx(o.x);
