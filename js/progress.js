@@ -11,12 +11,12 @@ const inc = (k, n = 1) => { state.stats[k] = stat(k) + n; };
 /* ------------------------------------------------------------------ */
 
 export const MODULES = [
-  { id: 'shield', e: '🛡️', n: 'Schutzschild', prices: [120, 260, 450], d: (L) => `+${L} Herz${L > 1 ? 'en' : ''} im Bosskampf` },
-  { id: 'time', e: '⏳', n: 'Zeitkristall', prices: [100, 220, 400], d: (L) => `Bosse laden ${L * 15} % langsamer` },
-  { id: 'laser', e: '🔥', n: 'Laser-Verstärker', prices: [100, 220, 400], d: (L) => `Längeres Zeitfenster für Blitz-Treffer (+${L * 30} %)` },
-  { id: 'turbo', e: '💨', n: 'Turbo-Triebwerk', prices: [80, 180, 320], d: (L) => `+${L * 20} % Fluggeschwindigkeit` },
-  { id: 'scanner', e: '📡', n: 'Schatz-Scanner', prices: [150, 300], d: (L) => (L === 1 ? 'Zeigt Schatztruhen auf der Minikarte' : 'Truhen auf der Minikarte + Pfeil zur nächsten Truhe') },
-  { id: 'magnet', e: '🧲', n: 'Splitter-Magnet', prices: [90, 200], d: (L) => `Sammelradius +${L * 60} %` },
+  { id: 'shield', icon: 'shield', n: 'Schutzschild', prices: [120, 260, 450], d: (L) => `+${L} Herz${L > 1 ? 'en' : ''} im Bosskampf` },
+  { id: 'time', icon: 'hourglass', n: 'Zeitkristall', prices: [100, 220, 400], d: (L) => `Bosse laden ${L * 15} % langsamer` },
+  { id: 'laser', icon: 'crosshair', n: 'Laser-Verstärker', prices: [100, 220, 400], d: (L) => `Längeres Zeitfenster für Blitz-Treffer (+${L * 30} %)` },
+  { id: 'turbo', icon: 'gauge', n: 'Turbo-Triebwerk', prices: [80, 180, 320], d: (L) => `+${L * 20} % Fluggeschwindigkeit` },
+  { id: 'scanner', icon: 'radar', n: 'Schatz-Scanner', prices: [150, 300], d: (L) => (L === 1 ? 'Zeigt Schatztruhen auf der Minikarte' : 'Truhen auf der Minikarte + Pfeil zur nächsten Truhe') },
+  { id: 'magnet', icon: 'magnet', n: 'Splitter-Magnet', prices: [90, 200], d: (L) => `Sammelradius +${L * 60} %` },
 ];
 export const mod = (id) => state.modules[id] || 0;
 
@@ -30,7 +30,7 @@ const BONUS_REWARD = 100;
 // make(ctx) → { kind, target, text, game? }; ctx: { games: [{id, name}], boss: bool }
 const POOL = [
   { kind: 'rounds', make: () => { const t = pick([8, 10, 12]); return { target: t, text: `Löse ${t} Rätsel` }; } },
-  { kind: 'combo', make: () => { const t = pick([4, 5]); return { target: t, text: `Schaffe eine Combo von ${t} (Rätsel ohne Fehler hintereinander)` }; } },
+  { kind: 'combo', make: () => { const t = pick([4, 5]); return { target: t, text: `Schaffe eine Combo von ${t}` }; } },
   { kind: 'planets', ok: (c) => c.games.length >= 3, make: () => ({ target: 3, text: 'Spiele Missionen auf 3 verschiedenen Planeten' }) },
   { kind: 'gameRounds', make: (c) => { const g = pick(c.games); return { target: 5, game: g.id, text: `Löse 5 Rätsel auf ${g.name}` }; } },
   { kind: 'perfect', make: () => ({ target: 1, text: 'Schaffe eine Mission ganz ohne Fehler' }) },
@@ -77,7 +77,7 @@ function advanceQuests(ev, data, out) {
       q.progress = q.target;
       q.done = true;
       state.crystals += QUEST_REWARD;
-      out.push({ e: '✅', title: 'Auftrag erledigt!', text: q.text, reward: `+${QUEST_REWARD} 💎` });
+      out.push({ icon: 'check', title: 'Auftrag erledigt!', text: q.text, reward: `+${QUEST_REWARD} Kristalle` });
     }
   }
   if (!state.quests.bonus && state.quests.list.every((q) => q.done)) {
@@ -85,7 +85,7 @@ function advanceQuests(ev, data, out) {
     state.crystals += BONUS_REWARD;
     state.eggs = (state.eggs || 0) + 1;
     inc('questDays');
-    out.push({ e: '🎉', title: 'Alle Tagesaufträge geschafft!', text: 'Morgen gibt es neue.', reward: `+${BONUS_REWARD} 💎 · 🥚 +1` });
+    out.push({ icon: 'trophy', title: 'Alle Tagesaufträge geschafft!', text: 'Morgen gibt es neue.', reward: `+${BONUS_REWARD} Kristalle · +1 Ei` });
   }
 }
 
@@ -126,7 +126,7 @@ function checkBadges(out) {
     if (state.badges.includes(b.id) || !b.ok()) continue;
     state.badges.push(b.id);
     state.crystals += BADGE_REWARD;
-    out.push({ e: b.e, title: 'Neues Abzeichen!', text: b.n, reward: `+${BADGE_REWARD} 💎` });
+    out.push({ e: b.e, title: 'Neues Abzeichen!', text: b.n, reward: `+${BADGE_REWARD} Kristalle` });
   }
 }
 

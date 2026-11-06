@@ -1,6 +1,7 @@
 import { h } from './util.js';
 import { sfx } from './audio.js';
 import { shake } from './fx.js';
+import { icon } from './icons.js';
 
 let keyHandler = null;
 export function setKeyHandler(fn) { keyHandler = fn; }
@@ -27,7 +28,7 @@ export function keypad(onKey) {
     class: 'key k-' + k,
     'aria-label': k === 'back' ? 'Löschen' : k === 'ok' ? 'Prüfen' : k,
     onClick: () => { sfx.click(); onKey(k); },
-  }, k === 'back' ? '⌫' : k === 'ok' ? '✓' : k)));
+  }, k === 'back' ? icon('delete') : k === 'ok' ? icon('check') : k)));
 }
 
 /**
@@ -92,7 +93,7 @@ export function modal(kids, { onClose, closable = true } = {}) {
   const esc = (e) => { if (e.key === 'Escape' && closable) close(); };
   const ov = h('div', { class: 'overlay', onClick: (e) => { if (e.target === ov && closable) close(); } },
     h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' },
-      closable ? h('button', { class: 'icon modal-x', type: 'button', 'aria-label': 'Schließen', onClick: close }, '✖') : null,
+      closable ? h('button', { class: 'icon modal-x', type: 'button', 'aria-label': 'Schließen', onClick: close }, icon('x')) : null,
       kids));
   document.body.append(ov);
   document.addEventListener('keydown', esc);

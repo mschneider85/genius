@@ -67,6 +67,8 @@ Das Weltall wird mit **WebGL** gezeichnet (`js/gl.js`, eigener kleiner Sprite-Re
 
 **Bedienung:** Jeder Bildschirm außerhalb des Alls hat oben links einen 🚀-Knopf zurück; das Planeten-Briefing zeigt den Start-Knopf immer ohne Scrollen; Professor Pis Infotafel klappt im All nach einigen Sekunden zur Eule ein, damit sie keine Planeten verdeckt.
 
+**Gestaltung:** Bedienelemente nutzen Linien-Icons ([Lucide](https://lucide.dev), ISC-Lizenz, als SVG in `js/icons.js`) statt Emojis und die Schrift [Outfit](https://github.com/Outfitio/Outfit-Fonts) (SIL Open Font License, lokal in `fonts/` und offline verfügbar). Emojis bleiben nur dort, wo sie Inhalt sind: Avatare, Figuren, Zahlenwesen, Abzeichen, sammelbare Schiffe und Rätsel-Objekte.
+
 | Gerät | Unterstützung |
 |---|---|
 | iPad ab iPadOS 15 (iPad 5, Air 2, mini 4 und neuer) | ✅ |

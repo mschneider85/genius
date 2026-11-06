@@ -1,12 +1,14 @@
 // Bei jeder Veröffentlichung VERSION erhöhen, damit alte Caches gelöscht werden.
-const VERSION = 'genius-v13';
+const VERSION = 'genius-v14';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/style.css',
+  './fonts/outfit-latin.woff2',
   './js/app.js',
   './js/util.js',
+  './js/icons.js',
   './js/state.js',
   './js/audio.js',
   './js/fx.js',

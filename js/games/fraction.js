@@ -1,5 +1,6 @@
 import { h, svg, rnd, pick } from '../util.js';
 import { fieldInput, frac } from '../ui.js';
+import { withIcon } from '../icons.js';
 
 function pie(n, filled, onTap) {
   const s = svg('svg', { viewBox: '-1.08 -1.08 2.16 2.16', class: 'pie' + (onTap ? ' interactive' : '') });
@@ -56,7 +57,7 @@ export default {
       draw();
       stage.append(
         h('p', { class: 'task' }, 'Lade genau ', frac(a, b), ' des Energiekerns! Tippe Stücke an.'),
-        h('div', { class: 'play column' }, holder, live, h('button', { type: 'button', class: 'btn primary big', onClick: check }, '⚡ Laden')));
+        h('div', { class: 'play column' }, holder, live, h('button', { type: 'button', class: 'btn primary big', onClick: check }, ...withIcon('zap', 'Laden'))));
       return;
     }
 
@@ -100,7 +101,7 @@ export default {
       const a = rnd(1, b - 1);
       const whole = b * rnd(2, L < 15 ? 6 : 12);
       answer = (whole / b) * a;
-      task = h('div', { class: 'answer' }, frac(a, b), ` von ${whole} 💎 = `, field);
+      task = h('div', { class: 'answer' }, frac(a, b), ` von ${whole} Kristallen = `, field);
       msg = `${whole} : ${b} = ${whole / b}, mal ${a} = ${answer}`;
     } else {
       const b = rnd(2, 6);

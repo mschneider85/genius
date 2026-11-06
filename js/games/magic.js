@@ -64,7 +64,7 @@ export default {
     fields.sort((a, b) => a.pos - b.pos);
 
     stage.append(
-      h('p', { class: 'task' }, showSum ? `Zaubersumme: ${S} – in jeder Reihe, Spalte und Diagonale.` : 'Zaubersumme: ❓ Finde sie selbst heraus!'),
+      h('p', { class: 'task' }, showSum ? `Zaubersumme: ${S} in jeder Reihe, Spalte und Diagonale.` : 'Zaubersumme: ? – finde sie heraus!'),
       h('div', { class: 'play' }, grid, fieldInput(api, fields, { onDone: () => api.solved({ msg: `Zaubersumme ${S} – perfekt!` }) })));
   },
 };

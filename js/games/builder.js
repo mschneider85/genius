@@ -1,5 +1,6 @@
 import { h, rnd, pick } from '../util.js';
 import { fieldInput } from '../ui.js';
+import { withIcon } from '../icons.js';
 
 const W = 8;
 const H = 8;
@@ -202,7 +203,7 @@ export default {
       h('p', { class: 'task' }, text),
       h('div', { class: 'play column' }, grid, live,
         h('div', { class: 'row' },
-          h('button', { type: 'button', class: 'btn ghost', onClick: () => { set.clear(); cells.forEach((c) => c.classList.remove('on')); update(); } }, '🧹 Leeren'),
-          h('button', { type: 'button', class: 'btn primary big', onClick: check }, '🏗️ Bauen'))));
+          h('button', { type: 'button', class: 'btn ghost', onClick: () => { set.clear(); cells.forEach((c) => c.classList.remove('on')); update(); } }, ...withIcon('trash-2', 'Leeren')),
+          h('button', { type: 'button', class: 'btn primary big', onClick: check }, ...withIcon('wrench', 'Bauen')))));
   },
 };

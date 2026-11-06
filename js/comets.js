@@ -3,6 +3,7 @@ import { h, svg, rnd, pick, shuffle, isPrime } from './util.js';
 import { keypad, fieldInput } from './ui.js';
 import { sfx } from './audio.js';
 import { toast, shake } from './fx.js';
+import { withIcon } from './icons.js';
 
 /**
  * Every puzzle returns:
@@ -117,7 +118,7 @@ function detective(L, done) {
     el: h('div', { class: 'play' },
       h('div', { class: 'column' },
         h('ol', { class: 'clues' }, clues.map((c) => h('li', {}, c.text))),
-        h('div', { class: 'answer' }, '🔍 Ich bin ', field)),
+        h('div', { class: 'answer' }, 'Ich bin ', field)),
       pad),
     keys: (k) => keyFn?.(k),
     hints: [
@@ -448,7 +449,7 @@ function matches(L, done) {
   return {
     title: 'Streichholzrätsel',
     intro: 'Diese Rechnung stimmt nicht! Lege genau EIN Streichholz um, damit sie stimmt. Tippe ein Streichholz an, um es aufzuheben, dann tippe auf einen freien Platz.',
-    el: h('div', { class: 'column' }, row, h('button', { type: 'button', class: 'btn ghost small', onClick: () => { st = clone(start); picked = null; draw(); } }, '↺ Zurücksetzen')),
+    el: h('div', { class: 'column' }, row, h('button', { type: 'button', class: 'btn ghost small', onClick: () => { st = clone(start); picked = null; draw(); } }, ...withIcon('rotate-ccw', 'Zurücksetzen'))),
     hints: [
       { text: 'Ziffern verwandeln sich mit einem Streichholz: 9 ↔ 8, 6 ↔ 8, 0 ↔ 8, 5 ↔ 6, 5 ↔ 9, 3 ↔ 9, 1 ↔ 7. Und aus + wird −, wenn du den senkrechten Stab wegnimmst!' },
       { text: 'Das Streichholz, das du umlegen musst, liegt in der gelb markierten Figur.', act: () => { hintSlot = first.from[0]; draw(); } },

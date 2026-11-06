@@ -1,4 +1,5 @@
 import { h } from './util.js';
+import { withIcon } from './icons.js';
 import { state, save } from './state.js';
 import { sfx } from './audio.js';
 import { setKeyHandler, getKeyHandler } from './ui.js';
@@ -362,17 +363,17 @@ function speaker(who, ctx) {
 export function buildScene(kind, id, gal = state.galaxy, games = {}) {
   const G = GALAXIES[gal];
   const ctx = { gal };
-  if (kind === 'prolog') return { title: `🌌 Prolog: ${G.name}`, lines: G.scenes.prolog, ctx };
+  if (kind === 'prolog') return { title: `Prolog: ${G.name}`, lines: G.scenes.prolog, ctx };
   if (kind === 'finaleIntro') return { title: `${G.fortress.e} ${G.fortress.n}`, lines: G.scenes.finaleIntro, ctx };
-  if (kind === 'ending') return { title: `🏆 ${G.name} ist gerettet!`, lines: G.scenes.ending, ctx };
+  if (kind === 'ending') return { title: `${G.name} ist gerettet!`, lines: G.scenes.ending, ctx };
   const p = planetInfo(games[id] || { id }, gal);
   ctx.npc = p.npc;
   const name = p.name;
-  if (kind === 'radio') return { title: `📻 Funkspruch: ${name}`, lines: p.radio, ctx };
+  if (kind === 'radio') return { title: `Funkspruch: ${name}`, lines: p.radio, ctx };
   if (kind === 'repaired') {
     const taunt = G.taunts[STORY_PLANETS.indexOf(id) % G.taunts.length];
     return {
-      title: `🔧 ${name} ist repariert`,
+      title: `${name} ist repariert`,
       lines: [
         ['npc', p.repaired],
         ['pi', 'Moment … da kommt ein seltsames Signal herein!'],
@@ -385,7 +386,7 @@ export function buildScene(kind, id, gal = state.galaxy, games = {}) {
   if (kind === 'decoded') {
     const n = coordsFound(gal);
     return {
-      title: `📩 Botschaft von ${name}`,
+      title: `Botschaft von ${name}`,
       lines: [
         ['villain', `„${p.msg}“`],
         p.reaction,
@@ -397,7 +398,7 @@ export function buildScene(kind, id, gal = state.galaxy, games = {}) {
     };
   }
   if (kind === 'shining') {
-    return { title: `✨ Kapitel geschafft: ${name}`, lines: [['npc', p.shining], ['pi', `${name} strahlt heller als je zuvor. Dieses Kapitel ist abgeschlossen!`]], ctx };
+    return { title: `Kapitel geschafft: ${name}`, lines: [['npc', p.shining], ['pi', `${name} strahlt heller als je zuvor. Dieses Kapitel ist abgeschlossen!`]], ctx };
   }
   throw new Error('Unknown scene ' + kind);
 }
@@ -477,8 +478,8 @@ function cutscene(sc, done) {
     row,
     h('div', { class: 'cs-foot' },
       dots,
-      h('button', { type: 'button', class: 'btn ghost small', onClick: (e) => { e.stopPropagation(); finish(); } }, 'Überspringen ⏭'),
-      h('button', { type: 'button', class: 'btn primary', onClick: (e) => { e.stopPropagation(); advance(); } }, 'Weiter ▶')));
+      h('button', { type: 'button', class: 'btn ghost small', onClick: (e) => { e.stopPropagation(); finish(); } }, 'Überspringen'),
+      h('button', { type: 'button', class: 'btn primary', onClick: (e) => { e.stopPropagation(); advance(); } }, ...withIcon('play', 'Weiter'))));
   document.body.append(ov);
   const prevKeys = getKeyHandler();
   setKeyHandler((k) => { if (k === 'ok') advance(); });

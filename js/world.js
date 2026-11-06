@@ -111,11 +111,11 @@ function labelTexture(R, o) {
     x.textBaseline = 'middle';
     x.shadowColor = 'rgba(0,0,0,0.85)';
     x.shadowBlur = 6 * S;
-    x.font = `800 ${21 * S}px system-ui, -apple-system, sans-serif`;
+    x.font = `700 ${21 * S}px Outfit, system-ui, -apple-system, sans-serif`;
     x.fillStyle = o.locked ? 'rgba(255,255,255,0.55)' : '#fff';
     x.fillText(o.name, w / 2, 13 * S);
     if (o.sub) {
-      x.font = `700 ${15 * S}px system-ui, -apple-system, sans-serif`;
+      x.font = `500 ${15 * S}px Outfit, system-ui, -apple-system, sans-serif`;
       x.fillStyle = 'rgba(220,225,255,0.85)';
       x.fillText(o.sub, w / 2, 35 * S);
     }
@@ -150,7 +150,7 @@ export function createWorld(root, cfg) {
   const minimap = h('canvas', { class: 'minimap', 'aria-hidden': 'true' });
   const prompt = h('button', { type: 'button', class: 'land-prompt' });
   const hint = cfg.tutorial
-    ? h('div', { class: 'world-hint' }, '👆 Gedrückt halten = fliegen', h('br'), '🪐 Planet antippen = Autopilot', h('span', { class: 'kbd' }, h('br'), '⌨️ Pfeiltasten / WASD · Enter = landen'))
+    ? h('div', { class: 'world-hint' }, 'Gedrückt halten = fliegen', h('br'), 'Planet antippen = Autopilot', h('span', { class: 'kbd' }, h('br'), 'Pfeiltasten / WASD · Enter = landen'))
     : null;
   root.append(canvas, minimap, prompt, hint);
   // iPad Safari: pinch gestures would zoom the whole page instead of steering.
@@ -310,7 +310,7 @@ export function createWorld(root, cfg) {
     if (!near || landing) { prompt.classList.remove('show'); return; }
     prompt.classList.add('show');
     prompt.disabled = !!near.locked;
-    prompt.textContent = near.locked ? near.lockText : `${near.verb || '🛬 Landen'}: ${near.name}`;
+    prompt.textContent = near.locked ? near.lockText : `${near.verb || 'Landen'}: ${near.name}`;
   }
 
   /* ---------- Update ---------- */

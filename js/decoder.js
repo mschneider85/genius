@@ -92,14 +92,14 @@ export function decoderView(game, onFinish) {
       setKeyHandler(null);
       sfx.win();
       confetti(120);
-      toast('Botschaft geknackt! +20 💎', 'good', 2200);
+      toast('Botschaft geknackt! +20 Kristalle', 'good', 2200);
       setTimeout(() => onFinish(el.isConnected), 1600); // false if the child already left
     },
   });
 
   const el = h('section', { class: 'panel decoder' },
     h('div', { class: 'dec-head' }, h('span', { class: 'dec-villain' }, villain.e), h('div', {},
-      h('h1', {}, '📩 Geheimbotschaft'),
+      h('h1', {}, 'Geheimbotschaft'),
       h('p', { class: 'muted' }, `Abgefangen auf ${p.name}. Absender: ${villain.n}`))),
     msgEl,
     h('p', {}, 'Jede Aufgabe ergibt eine Zahl – und jede Zahl ist ein Buchstabe. Tippe eine Aufgabe an und rechne!'),

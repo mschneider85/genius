@@ -1,5 +1,6 @@
 import { h, rnd, pick } from '../util.js';
 import { fieldInput } from '../ui.js';
+import { withIcon } from '../icons.js';
 
 export default {
   id: 'binary',
@@ -42,18 +43,18 @@ export default {
       api.setKeys((k) => { if (k === 'ok') send(); });
       draw();
       stage.append(
-        h('p', { class: 'task' }, `🤖 „Sag mir die Zahl ${target} in Lichtsprache!“ Schalte die richtigen Lampen an.`),
+        h('p', { class: 'task' }, `Zeige die Zahl ${target} mit den Lampen.`),
         h('div', { class: 'play column' }, lamps, sumEl,
-          h('button', { type: 'button', class: 'btn primary big', onClick: send }, '📡 Senden')));
+          h('button', { type: 'button', class: 'btn primary big', onClick: send }, ...withIcon('radio', 'Senden'))));
       return;
     }
 
     const field = h('button', { type: 'button', class: 'ansfield' });
     const display = mode === 'read'
       ? h('div', { class: 'lamps' }, vals.map((v, i) => lamp(v, i, code[i])))
-      : h('div', { class: 'robocode' }, '🤖 ', code.join(' '));
+      : h('div', { class: 'robocode' }, code.join(' '));
     stage.append(
-      h('p', { class: 'task' }, mode === 'read' ? '🤖 Welche Zahl zeigen die Lichter?' : `🤖 Robotercode mit ${bits} Stellen. Welche Zahl ist das?`),
+      h('p', { class: 'task' }, mode === 'read' ? 'Welche Zahl zeigen die Lichter?' : `Welche Zahl ist dieser Robotercode?`),
       h('div', { class: 'play' },
         h('div', { class: 'column' }, display, h('div', { class: 'answer' }, '= ', field)),
         fieldInput(api, [{ el: field, answer: target }], { onDone: () => api.solved({ msg: `${code.join('')} = ${target}` }) })));

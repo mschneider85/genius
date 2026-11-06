@@ -19,6 +19,7 @@ import { track, ensureQuests, questsOpen, MODULES, mod, BADGES, stat as statOf }
 import { question as mentalTask } from './games/duel.js';
 import { applyPerf } from './perf.js';
 import { PLANET_TYPES, paintPlanet, cachedArt } from './art.js';
+import { icon, withIcon } from './icons.js';
 
 registerGames(GAMES);
 const app = document.getElementById('app');
@@ -48,10 +49,10 @@ const SHIPS = [
   { id: '☄️', e: '☄️', n: 'Kometenreiter', gold: 7 },
 ];
 const THEMES = [
-  { id: 'nebula', e: '🟣', n: 'Lila Nebel', p: 0 },
-  { id: 'ozean', e: '🔵', n: 'Tiefsee-All', p: 120 },
-  { id: 'wald', e: '🟢', n: 'Nordlicht', p: 200 },
-  { id: 'sonne', e: '🟠', n: 'Sonnensturm', p: 300 },
+  { id: 'nebula', sw: ['#2a1b63', '#ffd166'], n: 'Lila Nebel', p: 0 },
+  { id: 'ozean', sw: ['#053a5c', '#5ff2d6'], n: 'Tiefsee-All', p: 120 },
+  { id: 'wald', sw: ['#0b3a2e', '#b6ff6b'], n: 'Nordlicht', p: 200 },
+  { id: 'sonne', sw: ['#5a1f0b', '#ffcf3f'], n: 'Sonnensturm', p: 300 },
 ];
 const GALAXY2_MIN_LEVEL = 15;
 
@@ -109,7 +110,14 @@ const encounterVillain = () => (state.finales[state.galaxy]
   ? { e: '🌀', n: 'Chaos-Wirbel', key: 'wirbel' }
   : { ...villain(), key: galaxy().villain });
 
-const stat = (icon, val, title, key) => h('span', { class: 'stat', title, 'data-k': key }, icon, ' ', h('b', {}, val));
+const stat = (name, val, title, key) => h('span', { class: 'stat', title, 'data-k': key }, icon(name), h('b', {}, val));
+
+/** Three big result stars, the first `n` lit. */
+const bigStars = (n) => h('div', { class: 'bigstars' }, [1, 2, 3].map((i) => {
+  const s = icon('star');
+  if (i <= n) s.classList.add('on');
+  return h('span', { class: i <= n ? 'on' : '', style: { animationDelay: i * 0.25 + 's' } }, s);
+}));
 
 /** Update live numbers in the visible top bar (e.g. after collecting crystals in space). */
 function refreshHud() {
@@ -122,7 +130,7 @@ function announce(items) {
   let box = document.getElementById('achv');
   if (!box) { box = h('div', { id: 'achv', 'aria-live': 'polite' }); document.body.append(box); }
   items.forEach((it, i) => setTimeout(() => {
-    const el = h('div', { class: 'achv' }, h('span', { class: 'achv-e' }, it.e),
+    const el = h('div', { class: 'achv' }, h('span', { class: 'achv-e' }, it.icon ? icon(it.icon) : it.e),
       h('div', {}, h('b', {}, it.title), h('span', {}, it.text), h('small', {}, it.reward)));
     box.append(el);
     sfx.coin();
@@ -137,17 +145,17 @@ function announce(items) {
 function topbar(back = true) {
   return h('header', { class: 'topbar' },
     h('div', { class: 'who' },
-      back ? h('button', { type: 'button', class: 'icon back-icon', title: 'Zurück ins All', 'aria-label': 'Zurück ins All', onClick: () => { sfx.click(); renderMap(); } }, '🚀') : null,
+      back ? h('button', { type: 'button', class: 'icon back-icon', title: 'Zurück ins All', 'aria-label': 'Zurück ins All', onClick: () => { sfx.click(); renderMap(); } }, icon('rocket')) : null,
       h('span', { class: 'avatar' }, state.avatar),
       h('div', {}, h('b', {}, state.name || 'Kadett'), h('small', {}, RANKS[rankIndex(state.stars)][1]))),
     h('div', { class: 'stats' },
-      stat('💎', state.crystals, 'Kristalle', 'crystals'),
-      stat('⭐', state.stars, 'Sterne'),
-      state.goldStars ? stat('🌟', state.goldStars, 'Goldsterne aus Knobel-Kometen') : null,
-      state.streak > 1 ? stat('🔥', state.streak, 'Tage in Folge gespielt') : null));
+      stat('gem', state.crystals, 'Kristalle', 'crystals'),
+      stat('star', state.stars, 'Sterne'),
+      state.goldStars ? stat('sparkles', state.goldStars, 'Goldsterne') : null,
+      state.streak > 1 ? stat('flame', state.streak, 'Tage in Folge') : null));
 }
 
-const backBtn = (label = '🚀 Zurück ins All') => h('button', { type: 'button', class: 'btn ghost', onClick: renderMap }, label);
+const backBtn = (label = 'Zurück ins All') => h('button', { type: 'button', class: 'btn ghost', onClick: renderMap }, ...withIcon('rocket', label));
 
 /* ---------- Willkommen ---------- */
 
@@ -166,11 +174,11 @@ function renderWelcome() {
 
   setScene('space');
   screen(h('section', { class: 'panel welcome' },
-    h('div', { class: 'logo' }, h('span', { class: 'logo-planet' }, '🪐'), h('h1', {}, 'Genius'), h('p', { class: 'sub' }, 'Die Sternenakademie')),
+    h('div', { class: 'logo' }, h('span', { class: 'logo-planet' }, icon('orbit')), h('h1', {}, 'Genius'), h('p', { class: 'sub' }, 'Die Sternenakademie')),
     h('p', {}, 'Der Chaos-Nebel hat die Galaxie Numeria durcheinandergewirbelt. Rette die Planeten mit Mathe-Power!'),
     h('label', { class: 'lbl' }, 'Wie heißt du, Kadett?'), nameIn,
     h('label', { class: 'lbl' }, 'Wähle deinen Avatar'), avatarRow,
-    h('label', { class: 'lbl' }, 'Wo startest du? (Das Spiel passt sich danach von selbst an dich an.)'), gradeRow,
+    h('label', { class: 'lbl' }, 'Wo startest du?'), gradeRow,
     h('button', {
       type: 'button', class: 'btn primary big',
       onClick: () => {
@@ -182,7 +190,7 @@ function renderWelcome() {
         sfx.win();
         renderMap();
       },
-    }, '🚀 Abheben!')));
+    }, ...withIcon('rocket', 'Abheben!'))));
 }
 
 /* ---------- Weltall ---------- */
@@ -205,7 +213,7 @@ function piAdvice() {
   const G = galaxy();
   const unlocked = GAME_LIST.filter(isUnlocked);
   const waiting = unlocked.find((g) => messageWaiting(g.id));
-  if (waiting) return { text: `📩 Auf ${info(waiting).name} wartet eine Geheimbotschaft! Folge dem gelben Pfeil und lande dort.`, target: waiting.id };
+  if (waiting) return { text: `Auf ${info(waiting).name} wartet eine Geheimbotschaft! Folge dem gelben Pfeil.`, target: waiting.id };
   if (finaleUnlocked() && !state.finales[state.galaxy]) return { text: `Alle Koordinaten gefunden! Der Schutzschild um ${G.fortress.n} ist weg – flieg hin!`, target: 'fortress' };
   if (state.finales[state.galaxy]) {
     if (state.galaxy === 0 && !seen('prolog', '', 1)) return { text: 'Numeria ist gerettet! Das Sternentor bringt dich nach Infinitas – folge dem Pfeil.', target: 'gate' };
@@ -215,14 +223,14 @@ function piAdvice() {
   const damaged = story.filter((g) => stageOf(g.id) === 0).sort((a, b) => points(b.id) - points(a.id))[0];
   if (damaged) return { text: `${info(damaged).name}: noch ${REPAIRED - points(damaged.id)} Punkte bis zur Reparatur. Fehlerfreie Rätsel bringen 2.`, target: damaged.id };
   const locked = GAME_LIST.filter((g) => !isUnlocked(g)).sort((a, b) => a.unlock - b.unlock)[0];
-  if (locked) return { text: `Sammle noch ${locked.unlock - state.stars} ⭐ – dann fällt der Schutzschild von ${info(locked).name}.`, target: locked.id };
+  if (locked) return { text: `Sammle noch ${locked.unlock - state.stars} Sterne – dann fällt der Schutzschild von ${info(locked).name}.`, target: locked.id };
   const shine = story.filter((g) => stageOf(g.id) === 1).sort((a, b) => points(b.id) - points(a.id))[0];
   if (shine) return { text: `${info(shine).name} kann noch strahlender werden: noch ${SHINING - points(shine.id)} Rettungspunkte.`, target: shine.id };
   if (questsOpen()) {
     const q = state.quests.list.find((x) => !x.done);
-    return { text: `📋 Tagesauftrag: ${q.text} (${q.progress}/${q.target}). Im All gibt es außerdem 💠 Sternensplitter und versteckte 🎁 Truhen!`, target: q.game || null };
+    return { text: `Tagesauftrag: ${q.text} (${q.progress}/${q.target})`, target: q.game || null };
   }
-  return { text: 'Weiter so! Sammle 💠 Splitter, suche 🎁 Truhen oder rüste dein Schiff in der Werft auf.', target: null };
+  return { text: 'Weiter so! Sammle Sternensplitter, suche Schatztruhen oder rüste dein Schiff in der Werft auf.', target: null };
 }
 
 function switchGalaxy(n) {
@@ -247,29 +255,29 @@ function worldObjects() {
     const goal = st === 0 ? REPAIRED : SHINING;
     return {
       id: g.id, kind: 'planet', game: g, ...posOf(g.id), r: g.id === 'duel' ? 62 : 72, hue: g.hue, emoji: p.emoji, name: p.name,
-      sub: locked ? `ab ${g.unlock} ⭐` : `${p.topic} · Stufe ${level(g.id)}`,
-      locked, lockText: `🔒 Schutzschild: ab ${g.unlock} ⭐ (du hast ${state.stars})`,
+      sub: locked ? `ab ${g.unlock} Sterne` : `${p.topic} · Stufe ${level(g.id)}`,
+      locked, lockText: `Schutzschild: ab ${g.unlock} Sterne (du hast ${state.stars})`,
       stage: st, mail: !locked && messageWaiting(g.id),
       bar: st === null ? null : st === 2 ? 1 : Math.min(1, points(g.id) / goal),
     };
   });
-  objs.push({ id: 'station', kind: 'station', ...posOf('station'), r: 55, hue: 210, emoji: '🛠️', name: 'Werft', sub: 'Schiffe & Farben', verb: '🛬 Andocken' });
+  objs.push({ id: 'station', kind: 'station', ...posOf('station'), r: 55, hue: 210, emoji: '🛠️', name: 'Werft', sub: 'Schiffe & Farben', verb: 'Andocken' });
   const open = finaleUnlocked();
   const n = coordsFound();
   objs.push({
     id: 'fortress', kind: 'planet', dark: true, ...posOf('fortress'), r: 85, hue: 345,
     emoji: open ? G.fortress.e : '❓', name: open ? G.fortress.n : 'Unbekanntes Signal',
-    sub: state.finales[state.galaxy] ? '✅ besiegt' : `🧩 ${n}/${STORY_PLANETS.length} Koordinaten`,
-    locked: !open, lockText: `🛡️ Schutzschild – finde alle Koordinaten (${n}/${STORY_PLANETS.length})`, verb: '⚔️ Angreifen',
+    sub: state.finales[state.galaxy] ? 'besiegt' : `${n}/${STORY_PLANETS.length} Koordinaten`,
+    locked: !open, lockText: `Schutzschild – finde alle Koordinaten (${n}/${STORY_PLANETS.length})`, verb: 'Angreifen',
   });
   if (state.maxGalaxy > 0) {
     const other = GALAXIES[1 - state.galaxy];
-    objs.push({ id: 'gate', kind: 'gate', ...posOf('gate'), r: 80, hue: 270, emoji: state.galaxy === 0 ? '♾️' : '🌌', name: `Sternentor nach ${other.name}`, verb: '🌀 Durchfliegen' });
+    objs.push({ id: 'gate', kind: 'gate', ...posOf('gate'), r: 80, hue: 270, emoji: state.galaxy === 0 ? '♾️' : '🌌', name: `Sternentor nach ${other.name}`, verb: 'Durchfliegen' });
   }
   return objs;
 }
 
-const hudBtn = (icon, label, onClick) => h('button', { type: 'button', class: 'hud-btn', title: label, 'aria-label': label, onClick }, h('span', {}, icon), h('small', {}, label));
+const hudBtn = (name, label, onClick) => h('button', { type: 'button', class: 'hud-btn', title: label, 'aria-label': label, onClick }, h('span', {}, icon(name)), h('small', {}, label));
 
 /* ---------- Erkundung: Sternensplitter & Schatztruhen ---------- */
 
@@ -316,7 +324,7 @@ function openChest(p, world) {
   const draw = () => {
     qEl.textContent = `${q.q} =`;
     disp.textContent = val || '?';
-    [...locks.children].forEach((d, k) => { d.textContent = k < opened ? '🔓' : '🔒'; });
+    [...locks.children].forEach((d, k) => d.replaceChildren(icon(k < opened ? 'lock-open' : 'lock')));
   };
   const finish = () => {
     state.world.taken.push(p.id);
@@ -328,7 +336,7 @@ function openChest(p, world) {
     close();
     confetti(120);
     sfx.win();
-    announce([{ e: '🎁', title: 'Schatztruhe geöffnet!', text: egg ? 'Darin: Kristalle und ein Ei-Splitter!' : 'Darin: funkelnde Kristalle!', reward: `+${gems} 💎${egg ? ' · 🥚 +1' : ''}` }, ...track('chest')]);
+    announce([{ icon: 'gift', title: 'Schatztruhe geöffnet!', text: egg ? 'Kristalle und ein Ei-Splitter!' : 'Funkelnde Kristalle!', reward: `+${gems} Kristalle${egg ? ' · +1 Ei' : ''}` }, ...track('chest')]);
   };
   const onKey = (k) => {
     if (k === 'back') val = val.slice(0, -1);
@@ -345,8 +353,8 @@ function openChest(p, world) {
     draw();
   };
   const close = modal([
-    h('h2', {}, '🎁 Rechen-Schloss'),
-    h('p', {}, 'Knacke alle 3 Schlösser, dann springt die Truhe auf!'),
+    h('h2', {}, 'Rechen-Schloss'),
+    h('p', {}, 'Knacke alle 3 Schlösser!'),
     locks, qEl, disp, keypad(onKey),
   ], { onClose: () => { setKeyHandler(null); if (!state.world.taken.includes(p.id)) world?.restorePickup(p); } });
   setKeyHandler(onKey);
@@ -378,12 +386,13 @@ function renderMap() {
   });
   const advice = piAdvice();
   const objects = worldObjects();
-  const musicBtn = hudBtn(state.music ? '🎵' : '🔇', 'Musik', () => {
+  const musicIcon = () => icon(state.music ? 'music' : 'volume-x');
+  const musicBtn = hudBtn(state.music ? 'music' : 'volume-x', 'Musik', () => {
     state.music = !state.music;
     save();
     setMusic(state.music);
     if (state.music) music('space');
-    musicBtn.firstChild.textContent = state.music ? '🎵' : '🔇';
+    musicBtn.firstChild.replaceChildren(musicIcon());
   });
   const worldEl = h('div', { class: 'world' });
   // Pi's status panel folds into a small owl button after a few seconds so it never hides planets.
@@ -398,8 +407,8 @@ function renderMap() {
   },
   h('span', { class: 'pi-face' }, CHARS.pi.e),
   h('div', {},
-    h('small', {}, `${G.name} · ${state.finales[state.galaxy] ? `${v.e} ${v.n} ist dein Freund` : `${v.e} ${v.n} – 🧩 ${coordsFound()}/${STORY_PLANETS.length}`}`
-      + (next ? ` · ${next[1]} in ${next[0] - state.stars} ⭐` : '')),
+    h('small', {}, `${G.name} · ${state.finales[state.galaxy] ? `${v.e} ${v.n} ist dein Freund` : `${v.e} ${v.n} – ${coordsFound()}/${STORY_PLANETS.length} Koordinaten`}`,
+      next ? [` · ${next[1]} in ${next[0] - state.stars} `, icon('star')] : null),
     h('span', {}, advice.text)));
   fold();
   screen(
@@ -408,12 +417,12 @@ function renderMap() {
       topbar(false),
       piPanel,
       h('nav', { class: 'hud-side' },
-        hudBtn('🌌', 'Expedition', () => startMission(playable.map((g) => g.id), { expedition: true })),
-        hudBtn('📋', questsOpen() ? `Aufträge ${3 - questsOpen()}/3` : 'Aufträge ✓', renderQuests),
-        hudBtn('📜', 'Logbuch', renderLog),
-        hudBtn('🥚', `${state.creatures.length}/${CREATURES.length}`, renderCollection),
+        hudBtn('orbit', 'Expedition', () => startMission(playable.map((g) => g.id), { expedition: true })),
+        hudBtn('clipboard-list', `Aufträge ${3 - questsOpen()}/3`, renderQuests),
+        hudBtn('book-open', 'Logbuch', renderLog),
+        hudBtn('egg', `${state.creatures.length}/${CREATURES.length}`, renderCollection),
         musicBtn,
-        hudBtn('👪', 'Eltern', renderParents))));
+        hudBtn('users', 'Eltern', renderParents))));
   setScene('world', 230, 'space');
 
   const from = lastLanded;
@@ -434,11 +443,11 @@ function renderMap() {
 
   if (!seen('prolog')) playScenes([{ kind: 'prolog' }], renderMap);
   else if (pendingScenes.length) playScenes(pendingScenes.splice(0), renderMap);
-  else if (freshQuests) piSay('Neuer Tag, neue Tagesaufträge! Tippe rechts auf 📋 Aufträge.', 7000);
+  else if (freshQuests) piSay('Neuer Tag, neue Tagesaufträge!', 7000);
   else if (state.cometReady && !state.cometIntro) {
     state.cometIntro = true;
     save();
-    piSay('Schau mal, ein Knobel-Komet fliegt durchs All! Folge dem blauen Pfeil und fang ihn – darin stecken Rätsel, die es auf keinem Planeten gibt.', 9000);
+    piSay('Ein Knobel-Komet fliegt durchs All! Folge dem blauen Pfeil und fang ihn – darin stecken Rätsel, die es auf keinem Planeten gibt.', 9000);
   }
 }
 
@@ -449,7 +458,7 @@ function rescueBar(id) {
   const pct = st === 2 ? 100 : Math.min(100, (pts / goal) * 100);
   return h('div', { class: 'rescue' },
     h('div', { class: 'rescue-bar' }, h('i', { style: { width: pct + '%' } })),
-    h('small', {}, st === 2 ? '✨ strahlend' : `${STAGE_NAMES[st]} · ${pts}/${goal}`));
+    h('small', {}, st === 2 ? 'strahlend' : `${STAGE_NAMES[st]} · ${pts}/${goal}`));
 }
 
 /** Painted planet thumbnail (same texture as in space, from the art cache). */
@@ -483,15 +492,15 @@ function renderPlanet(g) {
       npcText ? h('div', { class: 'npc-line' }, h('span', { class: 'npc-e' }, p.npc.e), h('div', {}, h('b', {}, p.npc.n), h('p', {}, npcText))) : null,
       h('p', { class: 'brief-text' }, p.intro),
       h('button', { type: 'button', class: 'btn primary big wide', onClick: () => startMission([g.id]) },
-        g.rounds > 1 ? `▶ Mission starten (${g.rounds} Rätsel)` : '⚔️ Kampf starten!'),
-      messageWaiting(g.id) ? h('button', { type: 'button', class: 'btn danger wide pulse', onClick: () => openDecoder(g) }, '📩 Geheimbotschaft entschlüsseln') : null,
+        ...(g.rounds > 1 ? withIcon('play', 'Mission starten') : withIcon('swords', 'Kampf starten!'))),
+      messageWaiting(g.id) ? h('button', { type: 'button', class: 'btn danger wide pulse', onClick: () => openDecoder(g) }, ...withIcon('mail', 'Geheimbotschaft entschlüsseln')) : null,
       h('div', { class: 'brief-foot' },
-        backBtn('🚀 Abheben'),
-        p.radio ? h('button', { type: 'button', class: 'btn ghost', onClick: () => playScenes([{ kind: 'radio', id: g.id }]) }, '📻 Funk') : null,
+        backBtn('Abheben'),
+        p.radio ? h('button', { type: 'button', class: 'btn ghost', onClick: () => playScenes([{ kind: 'radio', id: g.id }]) }, ...withIcon('radio', 'Funk')) : null,
         h('div', { class: 'level-adjust' },
-          h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe runter', onClick: () => adj(-1) }, '−'),
+          h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe runter', onClick: () => adj(-1) }, icon('minus')),
           h('span', {}, 'Stufe ', lv),
-          h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe hoch', onClick: () => adj(1) }, '+')))));
+          h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe hoch', onClick: () => adj(1) }, icon('plus'))))));
   setScene('surface', g.hue, g.id === 'duel' ? 'boss' : 'planet', planetLand(g, true));
   if (p.radio && !seen('radio', g.id)) playScenes([{ kind: 'radio', id: g.id }]);
 }
@@ -503,7 +512,7 @@ function openDecoder(g) {
     renderMap();
     playScenes([{ kind: 'decoded', id: g.id }], renderMap);
   });
-  screen(topbar(), view, h('div', { class: 'row' }, backBtn('🚀 Später – abheben')));
+  screen(topbar(), view, h('div', { class: 'row' }, backBtn('Abheben')));
   setScene('surface', g.hue, 'planet', planetLand(g, true));
   setKeyHandler(view.keyHandler);
 }
@@ -522,8 +531,8 @@ function renderFinale() {
       state.finales[state.galaxy] ? h('p', { class: 'callout' }, 'Schon einmal besiegt – aber ein Rückkampf geht immer!') : null,
       h('div', { class: 'row' },
         backBtn(),
-        seen('finaleIntro') ? h('button', { type: 'button', class: 'btn ghost', onClick: () => playScenes([{ kind: 'finaleIntro' }]) }, '🎬 Szene ansehen') : null,
-        h('button', { type: 'button', class: 'btn danger big', onClick: () => (seen('finaleIntro') ? start() : playScenes([{ kind: 'finaleIntro' }], start)) }, '⚔️ Angriff!'))));
+        seen('finaleIntro') ? h('button', { type: 'button', class: 'btn ghost', onClick: () => playScenes([{ kind: 'finaleIntro' }]) }, ...withIcon('film', 'Szene ansehen')) : null,
+        h('button', { type: 'button', class: 'btn danger big', onClick: () => (seen('finaleIntro') ? start() : playScenes([{ kind: 'finaleIntro' }], start)) }, ...withIcon('swords', 'Angriff!')))));
 }
 
 /* ---------- Mission ---------- */
@@ -556,15 +565,15 @@ function startMission(ids, { expedition = false, finale = false } = {}) {
     : null;
   screen(
     h('header', { class: 'mbar' },
-      h('button', { type: 'button', class: 'icon', title: 'Mission abbrechen', 'aria-label': 'Mission abbrechen', onClick: abortMission }, '✖'),
+      h('button', { type: 'button', class: 'icon', title: 'Mission abbrechen', 'aria-label': 'Mission abbrechen', onClick: abortMission }, icon('x')),
       title,
       prog,
       h('div', { class: 'mtools' },
         comboEl,
         lvBadge,
-        h('button', { type: 'button', class: 'icon', title: 'Tipp', 'aria-label': 'Tipp', onClick: showHint }, '💡'),
-        h('button', { type: 'button', class: 'pill', title: 'Zu schwer – leichter machen', onClick: () => bump(-2) }, '🐢 Leichter'),
-        h('button', { type: 'button', class: 'pill turbo', title: 'Zu leicht – schwerer machen!', onClick: () => bump(3) }, '⚡ Zu leicht!'))),
+        h('button', { type: 'button', class: 'icon', title: 'Tipp', 'aria-label': 'Tipp', onClick: showHint }, icon('lightbulb')),
+        h('button', { type: 'button', class: 'pill', title: 'Leichter machen', onClick: () => bump(-2) }, ...withIcon('turtle', 'Leichter')),
+        h('button', { type: 'button', class: 'pill turbo', title: 'Schwerer machen', onClick: () => bump(3) }, ...withIcon('zap', 'Zu leicht!')))),
     M.enc?.el,
     stage);
   nextRound();
@@ -586,7 +595,7 @@ function nextRound() {
   M.roundMistakes = 0;
   M.locked = false;
   const boss = M.finale && id === 'duel' ? finaleBoss() : null;
-  M.ui.title.textContent = boss ? `${boss.e} ${boss.n}` : `${p.emoji} ${p.name}`;
+  M.ui.title.textContent = boss ? `${boss.e} ${boss.n}` : p.name;
   setScene('surface', g.hue, id === 'duel' ? 'boss' : 'planet', { key: M.finale ? 'fortress' : id, base: M.finale ? 0 : planetLand(g).base });
   setRepair(M.idx / M.list.length, false);
   if (M.enc) {
@@ -664,7 +673,7 @@ function roundDone(g, opts) {
   if (g.rounds > 1) {
     M.combo = M.roundMistakes === 0 ? M.combo + 1 : 0;
     if (M.combo >= 2) M.comboBonus += 3 * M.combo;
-    M.ui.comboEl.textContent = M.combo >= 2 ? `🔥 Combo ×${M.combo}` : '';
+    M.ui.comboEl.replaceChildren(...(M.combo >= 2 ? withIcon('flame', `Combo ×${M.combo}`) : []));
     M.ui.comboEl.classList.remove('pop');
     void M.ui.comboEl.offsetWidth;
     M.ui.comboEl.classList.toggle('pop', M.combo >= 2);
@@ -710,14 +719,14 @@ function bump(d) {
   const id = M.list[M.idx];
   setLevel(id, level(id) + d);
   sfx.tick();
-  toast(d > 0 ? `⚡ Schwieriger! Stufe ${level(id)}` : `🐢 Etwas leichter: Stufe ${level(id)}`);
+  toast(d > 0 ? `Schwieriger: Stufe ${level(id)}` : `Leichter: Stufe ${level(id)}`);
   nextRound();
 }
 
 function showHint() {
   if (!M) return;
   const g = GAMES[M.list[M.idx]];
-  modal([h('h2', {}, '💡 Tipp'), h('div', { class: 'npc-line' }, h('span', { class: 'npc-e' }, CHARS.pi.e), h('div', {}, h('b', {}, CHARS.pi.n), h('p', {}, current?.hint || g.hint)))]);
+  modal([h('h2', {}, 'Tipp'), h('div', { class: 'npc-line' }, h('span', { class: 'npc-e' }, CHARS.pi.e), h('div', {}, h('b', {}, CHARS.pi.n), h('p', {}, current?.hint || g.hint)))]);
 }
 
 function abortMission() {
@@ -834,10 +843,10 @@ function renderResult(r) {
   M = null;
   if (r.win) { sfx.win(); confetti(140, 0.5, 0.3); } else sfx.lose();
   const changeLines = r.changes.map(([p, a, b]) => h('li', {},
-    `${p.emoji} ${p.name}: Stufe ${a}`, b !== a ? ` → ${b}` : '', b > a + 1 ? ' 🚀 Turbo-Aufstieg!' : b > a ? ' ⬆️' : b < a ? ' (wir üben noch etwas)' : ''));
+    `${p.name}: Stufe ${a}`, b !== a ? ` → ${b}` : '', b > a + 1 ? ' · Turbo-Aufstieg!' : ''));
   const rescueLines = (r.rescue || []).map(([p, a, b]) => {
     const st = stageOf(p.id);
-    return h('li', {}, `🔧 ${p.name}: Rettung +${b - a} → ${st === 2 ? '✨ strahlend' : `${STAGE_NAMES[st]} (${b}/${st === 0 ? REPAIRED : SHINING})`}`);
+    return h('li', {}, `${p.name}: Rettung +${b - a} → ${st === 2 ? 'strahlend' : `${STAGE_NAMES[st]} (${b}/${st === 0 ? REPAIRED : SHINING})`}`);
   });
   const eggsLeft = Math.max(1, 2 - (state.eggs || 0));
   const eggCreaturesLeft = CREATURES.some((c) => !c.comet && !state.creatures.includes(c.id));
@@ -848,23 +857,22 @@ function renderResult(r) {
     topbar(),
     h('section', { class: 'panel result' },
       h('h1', {}, r.win ? (r.stars === 3 ? 'Perfekte Mission!' : 'Mission erfüllt!') : r.lost ? `${encounterVillain().n} hat diese Runde gewonnen …` : r.finale ? `${v.n} war diesmal stärker …` : 'Der Gegner war stärker …'),
-      h('div', { class: 'bigstars' }, [1, 2, 3].map((i) => h('span', { class: i <= r.stars ? 'on' : '', style: { animationDelay: i * 0.25 + 's' } }, '⭐'))),
-      !r.boss && r.win ? h('p', {}, r.mistakes === 0 ? 'Kein einziger Fehler!' : `${r.mistakes} Fehlversuch${r.mistakes === 1 ? '' : 'e'} – Fehler sind Trainingsdaten fürs Gehirn.`) : null,
-      r.lost ? h('p', {}, 'Deine Lebensenergie ist leer. Kurz durchatmen – mit „Nochmal versuchen“ startest du mit voller Energie neu!') : null,
-      !r.win && !r.lost ? h('p', {}, 'Kein Problem – jeder Versuch macht dich schneller. Nochmal?') : null,
-      h('p', { class: 'earn' }, `+${r.crystals} 💎`),
-      r.comboBonus ? h('p', { class: 'muted' }, `🔥 davon Combo-Bonus: +${r.comboBonus} 💎`) : null,
+      bigStars(r.stars),
+      !r.boss && r.win ? h('p', {}, r.mistakes === 0 ? 'Kein einziger Fehler!' : `${r.mistakes} Fehlversuch${r.mistakes === 1 ? '' : 'e'}`) : null,
+      r.lost ? h('p', {}, 'Deine Lebensenergie ist leer.') : null,
+      r.crystals ? h('p', { class: 'earn' }, `+${r.crystals} `, icon('gem')) : null,
+      r.comboBonus ? h('p', { class: 'muted' }, `davon Combo-Bonus: +${r.comboBonus} `, icon('gem')) : null,
       h('ul', { class: 'changes' }, changeLines, rescueLines),
-      r.waiting ? h('button', { type: 'button', class: 'btn danger pulse', onClick: () => openDecoder(r.waiting) }, `📩 Botschaft auf ${info(r.waiting).name} entschlüsseln`) : null,
+      r.waiting ? h('button', { type: 'button', class: 'btn danger pulse', onClick: () => openDecoder(r.waiting) }, ...withIcon('mail', `Botschaft auf ${info(r.waiting).name} entschlüsseln`)) : null,
       r.win && !r.boss ? h('div', { class: 'callout' }, `${encounterVillain().e} ${encounterVillain().n} ist geflohen!`) : null,
-      r.rankUp ? h('div', { class: 'callout' }, `🎖️ Neuer Rang: ${r.rankUp}!`) : null,
-      r.unlocked.map((g) => h('div', { class: 'callout' }, `🪐 Neuer Planet entdeckt: ${g.emoji} ${info(g).name}!`)),
+      r.rankUp ? h('div', { class: 'callout' }, ...withIcon('medal', `Neuer Rang: ${r.rankUp}!`)) : null,
+      r.unlocked.map((g) => h('div', { class: 'callout' }, ...withIcon('orbit', `Neuer Planet entdeckt: ${info(g).name}!`))),
       r.hatched
-        ? h('div', { class: 'hatch' }, h('p', {}, '🥚 Ein Zahlenwesen ist geschlüpft!'), creatureCard(r.hatched, true))
-        : (eggCreaturesLeft && r.stars > 0 ? h('p', { class: 'muted' }, `🥚 Noch ${eggsLeft} Mission${eggsLeft === 1 ? '' : 'en'} bis zum nächsten Zahlenwesen`) : null),
+        ? h('div', { class: 'hatch' }, h('p', {}, 'Ein Zahlenwesen ist geschlüpft!'), creatureCard(r.hatched, true))
+        : (eggCreaturesLeft && r.stars > 0 ? h('p', { class: 'muted' }, ...withIcon('egg', `Noch ${eggsLeft} Mission${eggsLeft === 1 ? '' : 'en'} bis zum nächsten Zahlenwesen`)) : null),
       h('div', { class: 'row' },
-        backBtn('🚀 Abheben'),
-        h('button', { type: 'button', class: 'btn primary big', onClick: () => startMission(lastMission.ids, lastMission) }, r.win ? '▶ Nächste Mission' : '↻ Nochmal versuchen'))));
+        backBtn('Abheben'),
+        h('button', { type: 'button', class: 'btn primary big', onClick: () => startMission(lastMission.ids, lastMission) }, ...(r.win ? withIcon('play', 'Nächste Mission') : withIcon('rotate-ccw', 'Nochmal versuchen'))))));
   if (r.hatched) setTimeout(() => sfx.hatch(), 900);
   if (r.scenes?.length) {
     const panel = app.querySelector('.result');
@@ -884,21 +892,21 @@ function renderCredits(stars, crystals) {
   screen(
     topbar(),
     h('section', { class: 'panel result credits' },
-      h('h1', {}, gal === 0 ? '🏆 Numeria ist gerettet!' : '🏆 GENIUS!'),
+      h('h1', {}, gal === 0 ? 'Numeria ist gerettet!' : 'GENIUS!'),
       h('div', { class: 'friends' }, friends.map((e) => h('span', {}, e))),
-      h('div', { class: 'bigstars' }, [1, 2, 3].map((i) => h('span', { class: i <= stars ? 'on' : '', style: { animationDelay: i * 0.25 + 's' } }, '⭐'))),
-      h('p', { class: 'earn' }, `+${crystals} 💎`),
+      bigStars(stars),
+      h('p', { class: 'earn' }, `+${crystals} `, icon('gem')),
       h('ul', { class: 'changes' },
-        h('li', {}, `🚀 Missionen: ${state.missions}`),
-        h('li', {}, `⭐ Sterne: ${state.stars}`),
-        h('li', {}, `🥚 Zahlenwesen: ${state.creatures.length}/${CREATURES.length}`),
-        h('li', {}, `📈 Höchste Stufe: ${maxLevel}`)),
+        h('li', {}, `Missionen: ${state.missions}`),
+        h('li', {}, `Sterne: ${state.stars}`),
+        h('li', {}, `Zahlenwesen: ${state.creatures.length}/${CREATURES.length}`),
+        h('li', {}, `Höchste Stufe: ${maxLevel}`)),
       h('p', {}, gal === 0
         ? 'Doch weit draußen flackert ein neues Signal … In der Galaxie Infinitas verschwinden Zahlen im Nichts. Die Rätsel dort sind schwerer – bist du bereit?'
         : 'Zwei Galaxien gerettet! Aber die Mathematik ist unendlich – genau wie Infinitas. Alle Planeten bleiben offen, bis Stufe 40 und für jeden Rückkampf.'),
       h('div', { class: 'row' },
-        backBtn('🚀 Zurück ins All'),
-        gal === 0 ? h('button', { type: 'button', class: 'btn primary big', onClick: () => switchGalaxy(1) }, '🚀 Auf nach Infinitas!') : null)));
+        backBtn(),
+        gal === 0 ? h('button', { type: 'button', class: 'btn primary big', onClick: () => switchGalaxy(1) }, ...withIcon('rocket', 'Auf nach Infinitas!')) : null)));
 }
 
 /* ---------- Knobel-Kometen ---------- */
@@ -916,7 +924,7 @@ const cometLevel = () => state.cometLevel ?? Math.round(GAME_LIST.reduce((s, g) 
 function renderComet() {
   if (!comet) { comet = makeComet(cometLevel(), cometSolved); comet.hintIdx = 0; }
   const c = comet;
-  const hintLabel = () => (c.hintIdx < c.hints.length ? `💡 Tipp ${c.hintIdx + 1}/${c.hints.length}` : '💡 Keine Tipps mehr');
+  const hintLabel = () => withIcon('lightbulb', c.hintIdx < c.hints.length ? `Tipp ${c.hintIdx + 1}/${c.hints.length}` : 'Keine Tipps mehr');
   const hintBtn = h('button', {
     type: 'button', class: 'btn',
     onClick: () => {
@@ -925,17 +933,17 @@ function renderComet() {
       hint.act?.();
       c.hintIdx++;
       piSay(hint.text, 14000);
-      hintBtn.textContent = hintLabel();
+      hintBtn.replaceChildren(...hintLabel());
     },
-  }, hintLabel());
+  }, ...hintLabel());
   const actions = h('div', { class: 'row' },
-    backBtn('🚀 Zurück ins All (der Komet wartet)'),
+    backBtn(),
     hintBtn,
-    h('button', { type: 'button', class: 'btn ghost', onClick: () => cometGiveUp(actions) }, '🏳️ Auflösen'));
+    h('button', { type: 'button', class: 'btn ghost', onClick: () => cometGiveUp(actions) }, ...withIcon('flag', 'Auflösen')));
   setScene('space');
   screen(topbar(), h('section', { class: 'panel comet-panel' },
-    h('div', { class: 'dec-head' }, h('span', { class: 'comet-icon' }, '☄️'), h('div', {},
-      h('h1', {}, c.title), h('p', { class: 'muted' }, 'Knobel-Komet · freiwillig · ohne Zeitdruck'))),
+    h('div', { class: 'dec-head' }, h('span', { class: 'comet-icon' }, icon('sparkles')), h('div', {},
+      h('h1', {}, c.title))),
     h('p', {}, c.intro),
     c.el,
     actions));
@@ -960,7 +968,7 @@ function cometSolved() {
   setKeyHandler(null);
   sfx.win();
   confetti(160);
-  toast('Geknackt! 🌟', 'good');
+  toast('Geknackt!', 'good');
   const panel = app.querySelector('.comet-panel');
   setTimeout(() => { if (panel?.isConnected) renderCometReward(gained); }, 1400);
 }
@@ -969,13 +977,12 @@ function renderCometReward(gained) {
   const next = COMET_REWARDS.find((r) => r.gold > state.goldStars);
   setScene('space');
   screen(topbar(), h('section', { class: 'panel result' },
-    h('h1', {}, '🌟 Goldstern!'),
-    h('p', {}, 'Du hast den Knobel-Kometen geknackt. Goldsterne sammelst du nur hier – sie zeigen, was für ein Knobel-Profi du bist.'),
-    h('p', { class: 'earn' }, '+1 🌟  +30 💎'),
+    h('h1', {}, 'Goldstern!'),
+    h('p', { class: 'earn' }, '+1 ', icon('sparkles'), ' · +30 ', icon('gem')),
     gained.map((r) => (r.creature
-      ? h('div', { class: 'hatch' }, h('p', {}, '☄️ Ein Kometen-Zahlenwesen ist zu dir geflogen!'), creatureCard(CREATURES.find((c) => c.id === r.creature), true))
-      : h('div', { class: 'callout' }, '🚀 Neues Schiff: ☄️ Kometenreiter! Du findest es in der Werft.'))),
-    next ? h('p', { class: 'muted' }, `Nächste Kometen-Belohnung bei ${next.gold} 🌟`) : null,
+      ? h('div', { class: 'hatch' }, h('p', {}, 'Ein Kometen-Zahlenwesen ist zu dir geflogen!'), creatureCard(CREATURES.find((c) => c.id === r.creature), true))
+      : h('div', { class: 'callout' }, 'Neues Schiff in der Werft: ☄️ Kometenreiter!'))),
+    next ? h('p', { class: 'muted' }, `Nächste Kometen-Belohnung bei ${next.gold} `, icon('sparkles')) : null,
     h('div', { class: 'row' }, backBtn())));
   if (gained.some((r) => r.creature)) setTimeout(() => sfx.hatch(), 600);
 }
@@ -1000,25 +1007,24 @@ function renderQuests() {
   screen(
     topbar(),
     h('section', { class: 'panel' },
-      h('h1', {}, '📋 Aufträge & Abzeichen'),
+      h('h1', {}, 'Aufträge & Abzeichen'),
       h('h3', {}, 'Heutige Aufträge'),
       h('div', { class: 'quests' }, quests.map((q) => h('div', { class: 'quest' + (q.done ? ' done' : '') },
-        h('span', { class: 'q-check' }, q.done ? '✅' : '⬜'),
+        h('span', { class: 'q-check q-box' }, q.done ? icon('check') : null),
         h('div', { class: 'q-body' },
           h('b', {}, q.text),
           h('div', { class: 'rescue-bar' }, h('i', { style: { width: (q.progress / q.target) * 100 + '%' } })),
-          h('small', {}, `${q.progress}/${q.target} · +40 💎`))))),
-      h('p', { class: 'muted' }, state.quests.bonus ? '🎉 Alle geschafft – der Tagesbonus ist eingesammelt!' : 'Schaffst du alle drei, gibt es +100 💎 und einen Ei-Splitter 🥚. Morgen kommen neue Aufträge.'),
+          h('small', {}, `${q.progress}/${q.target} · +40 `, icon('gem')))))),
       h('h3', {}, `Abzeichen ${state.badges.length}/${BADGES.length}`),
       h('div', { class: 'badges' }, BADGES.map((b) => {
         const got = state.badges.includes(b.id);
-        return h('div', { class: 'badge-card' + (got ? '' : ' locked') }, h('span', { class: 'ce' }, got ? b.e : '🔒'), h('b', {}, b.n), h('small', {}, b.d));
+        return h('div', { class: 'badge-card' + (got ? '' : ' locked') }, h('span', { class: 'ce' }, b.e), h('b', {}, b.n), h('small', {}, b.d));
       })),
       h('h3', {}, 'Deine Statistik'),
       h('ul', { class: 'changes' },
-        h('li', {}, `🧮 Rätsel gelöst: ${statOf('rounds')} · 🔥 beste Combo: ${statOf('maxCombo')}`),
-        h('li', {}, `🎁 Truhen: ${statOf('chests')} · 💠 Splitter: ${statOf('shards')}`),
-        h('li', {}, `⚔️ Bosssiege: ${statOf('bossWins')} · 🌠 Kometen: ${statOf('comets')} · 📩 Botschaften: ${statOf('decoded')}`)),
+        h('li', {}, `Rätsel gelöst: ${statOf('rounds')} · beste Combo: ${statOf('maxCombo')}`),
+        h('li', {}, `Truhen: ${statOf('chests')} · Splitter: ${statOf('shards')}`),
+        h('li', {}, `Bosssiege: ${statOf('bossWins')} · Kometen: ${statOf('comets')} · Botschaften: ${statOf('decoded')}`)),
       h('div', { class: 'row' }, backBtn())));
 }
 
@@ -1028,7 +1034,7 @@ function renderLog() {
   const sections = GALAXIES.slice(0, state.maxGalaxy + 1).map((G, gal) => {
     const items = sceneOrder(gal);
     return [
-      h('h3', {}, `${gal === 0 ? '🌌' : '♾️'} ${G.name}`),
+      h('h3', {}, G.name),
       items.length
         ? h('div', { class: 'log' }, items.map(([kind, id]) => h('button', {
           type: 'button', class: 'log-item', onClick: () => playScenes([{ kind, id, gal }]),
@@ -1040,8 +1046,7 @@ function renderLog() {
   screen(
     topbar(),
     h('section', { class: 'panel' },
-      h('h1', {}, '📜 Logbuch'),
-      h('p', {}, 'Alle Funksprüche, Botschaften und Kapitel deiner Reise. Tippe einen an, um ihn noch mal zu erleben.'),
+      h('h1', {}, 'Logbuch'),
       sections,
       h('div', { class: 'row' }, backBtn())));
 }
@@ -1058,14 +1063,13 @@ function renderCollection() {
   screen(
     topbar(),
     h('section', { class: 'panel' },
-      h('h1', {}, '🥚 Zahlenwesen'),
-      h('p', {}, 'Nach jeder zweiten Mission schlüpft ein Zahlenwesen. ☄️-Wesen gibt es nur bei Knobel-Kometen.'),
+      h('h1', {}, 'Zahlenwesen'),
       h('div', { class: 'creatures' }, CREATURES.map((c) => {
         const owned = state.creatures.includes(c.id);
         return h('button', {
           type: 'button', class: 'creature' + (owned ? '' : ' unknown'),
           onClick: () => (owned ? modal([creatureCard(c, true)]) : toast(c.comet ? 'Dieses Zahlenwesen kommt nur mit Knobel-Kometen.' : 'Dieses Zahlenwesen schläft noch in seinem Ei.')),
-        }, h('span', { class: 'ce' }, owned ? c.e : c.comet ? '☄️' : '❔'), h('b', {}, owned ? c.n : '???'));
+        }, h('span', { class: 'ce' }, owned ? c.e : icon(c.comet ? 'sparkles' : 'egg')), h('b', {}, owned ? c.n : '???'));
       })),
       h('div', { class: 'row' }, backBtn())));
 }
@@ -1081,13 +1085,13 @@ function renderShop() {
       type: 'button', class: 'shop-item module' + (L ? ' sel' : ''),
       onClick: () => {
         if (maxed) { toast(`${m.n} ist voll ausgebaut!`); return; }
-        buy({ e: m.e, n: `${m.n} – Stufe ${L + 1}`, p: price }, () => { state.modules[m.id] = L + 1; });
+        buy({ n: `${m.n} – Stufe ${L + 1}`, p: price }, () => { state.modules[m.id] = L + 1; });
       },
     },
-    h('span', { class: 'ce' }, m.e), h('b', {}, m.n),
+    h('span', { class: 'ce' }, icon(m.icon)), h('b', {}, m.n),
     h('span', { class: 'pips' }, m.prices.map((_, k) => (k < L ? '●' : '○')).join(' ')),
     h('small', { class: 'mod-d' }, m.d(maxed ? L : L + 1)),
-    h('small', {}, maxed ? 'voll ausgebaut' : `${L ? 'Upgrade' : 'Kaufen'}: ${price} 💎`));
+    h('small', {}, ...(maxed ? ['voll ausgebaut'] : [`${L ? 'Upgrade' : 'Kaufen'}: ${price} `, icon('gem')])));
   };
   const shipItem = (s) => {
     const owned = state.ships.includes(s.id);
@@ -1095,9 +1099,9 @@ function renderShop() {
     return h('button', {
       type: 'button', class: 'shop-item' + (on ? ' sel' : ''),
       onClick: () => {
-        if (owned) { state.ship = s.id; save(); sfx.click(); renderShop(); } else if (s.gold) { sfx.wrong(); toast(`Nur für Knobel-Profis: Sammle ${s.gold} 🌟 Goldsterne mit Knobel-Kometen.`); } else buy(s, () => { state.ships.push(s.id); state.ship = s.id; });
+        if (owned) { state.ship = s.id; save(); sfx.click(); renderShop(); } else if (s.gold) { sfx.wrong(); toast(`Nur für Knobel-Profis: Sammle ${s.gold} Goldsterne mit Knobel-Kometen.`); } else buy(s, () => { state.ships.push(s.id); state.ship = s.id; });
       },
-    }, h('span', { class: 'ce' }, s.e), h('b', {}, s.n), h('small', {}, on ? 'aktiv' : owned ? 'auswählen' : s.gold ? `ab ${s.gold} 🌟` : `${s.p} 💎`));
+    }, h('span', { class: 'ce' }, s.e), h('b', {}, s.n), h('small', {}, ...(on ? ['aktiv'] : owned ? ['auswählen'] : s.gold ? [`ab ${s.gold} `, icon('sparkles')] : [`${s.p} `, icon('gem')])));
   };
   const themeItem = (t) => {
     const owned = state.themes.includes(t.id);
@@ -1107,15 +1111,15 @@ function renderShop() {
       onClick: () => {
         if (owned) { state.theme = t.id; save(); applySettings(); sfx.click(); renderShop(); } else buy(t, () => { state.themes.push(t.id); state.theme = t.id; });
       },
-    }, h('span', { class: 'ce' }, t.e), h('b', {}, t.n), h('small', {}, on ? 'aktiv' : owned ? 'auswählen' : `${t.p} 💎`));
+    }, h('span', { class: 'ce' }, h('span', { class: 'swatch', style: { background: `linear-gradient(135deg, ${t.sw[0]} 50%, ${t.sw[1]} 50%)` } })), h('b', {}, t.n),
+    h('small', {}, ...(on ? ['aktiv'] : owned ? ['auswählen'] : [`${t.p} `, icon('gem')])));
   };
   setScene('surface', 210, 'planet');
   screen(
     topbar(),
     h('section', { class: 'panel' },
-      h('h1', {}, '🛠️ Werft'),
-      h('p', {}, 'Tausche Kristalle gegen Schiffe, Farben und Module. Das Wechselgeld rechnest du selbst aus!'),
-      h('h3', {}, 'Schiffs-Module (verbessern dein Spiel)'),
+      h('h1', {}, 'Werft'),
+      h('h3', {}, 'Schiffs-Module'),
       h('div', { class: 'shop' }, MODULES.map(moduleItem)),
       h('h3', {}, 'Raumschiffe'),
       h('div', { class: 'shop' }, SHIPS.map(shipItem)),
@@ -1127,7 +1131,7 @@ function renderShop() {
 function buy(item, grant) {
   if (state.crystals < item.p) {
     sfx.wrong();
-    toast(`Dir fehlen noch ${item.p - state.crystals} 💎.`, 'bad');
+    toast(`Dir fehlen noch ${item.p - state.crystals} Kristalle.`, 'bad');
     return;
   }
   const answer = state.crystals - item.p;
@@ -1145,7 +1149,7 @@ function buy(item, grant) {
         close();
         sfx.coin();
         confetti(80);
-        toast('Richtig gerechnet! +5 💎 Bonus', 'good');
+        toast('Richtig gerechnet! +5 Kristalle Bonus', 'good');
         renderShop();
         return;
       }
@@ -1157,9 +1161,9 @@ function buy(item, grant) {
     disp.textContent = val || '?';
   };
   const close = modal([
-    h('h2', {}, `${item.e} ${item.n}`),
-    h('p', {}, `Du hast ${state.crystals} 💎. Es kostet ${item.p} 💎.`),
-    h('p', {}, h('b', {}, 'Wie viele 💎 bleiben dir übrig?')),
+    h('h2', {}, item.e ? `${item.e} ${item.n}` : item.n),
+    h('p', {}, `Du hast ${state.crystals} Kristalle. Es kostet ${item.p}.`),
+    h('p', {}, h('b', {}, 'Wie viele Kristalle bleiben dir übrig?')),
     disp,
     keypad(onKey),
   ], { onClose: () => setKeyHandler(null) });
@@ -1173,22 +1177,24 @@ function renderParents() {
     const lv = h('b', {}, level(g.id));
     const adj = (d) => { setLevel(g.id, level(g.id) + d); lv.textContent = level(g.id); };
     return h('tr', {},
-      h('td', {}, `${g.emoji} ${g.name}`), h('td', { class: 'muted' }, g.topic),
+      h('td', {}, g.name), h('td', { class: 'muted' }, g.topic),
       h('td', { class: 'lvcell' },
-        h('button', { type: 'button', class: 'btn small', onClick: () => adj(-1) }, '−'), lv,
-        h('button', { type: 'button', class: 'btn small', onClick: () => adj(1) }, '+')));
+        h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe runter', onClick: () => adj(-1) }, icon('minus')), lv,
+        h('button', { type: 'button', class: 'btn small', 'aria-label': 'Stufe hoch', onClick: () => adj(1) }, icon('plus'))));
   });
   const nameIn = h('input', { type: 'text', maxlength: 16, value: state.name, 'aria-label': 'Name' });
+  const soundLabel = () => (state.sound ? withIcon('volume-2', 'Töne an') : withIcon('volume-x', 'Töne aus'));
+  const musicLabel = () => (state.music ? withIcon('music', 'Musik an') : withIcon('volume-x', 'Musik aus'));
   setScene('space');
   screen(
     topbar(),
     h('section', { class: 'panel parents' },
-      h('h1', {}, '👪 Für Eltern & Lehrkräfte'),
+      h('h1', {}, 'Für Eltern & Lehrkräfte'),
       h('p', {}, 'Für Kinder, denen Mathe zu leicht ist: neue Themen statt nur schneller rechnen.'),
       h('ul', { class: 'parents-facts' },
-        h('li', {}, '🎯 Passt sich an: jeder Planet hat Stufen 1–40, „⚡ Zu leicht!“ springt sofort 3 hoch.'),
-        h('li', {}, '💡 Hilfe ohne Strafe: Tipps sind kostenlos, nach einer Niederlage geht es sofort weiter.'),
-        h('li', {}, '🔒 Keine Werbung, kein Tracking, kein Konto. Alles bleibt auf diesem Gerät, auch offline.')),
+        h('li', {}, 'Passt sich an: jeder Planet hat Stufen 1–40, „Zu leicht!“ springt sofort 3 hoch.'),
+        h('li', {}, 'Hilfe ohne Strafe: Tipps sind kostenlos, nach einer Niederlage geht es sofort weiter.'),
+        h('li', {}, 'Keine Werbung, kein Tracking, kein Konto. Alles bleibt auf diesem Gerät, auch offline.')),
       h('h3', {}, 'Stufen anpassen'),
       h('table', { class: 'levels' }, h('tbody', {}, rows)),
       h('h3', {}, 'Einstellungen'),
@@ -1196,13 +1202,13 @@ function renderParents() {
         h('button', { type: 'button', class: 'btn small', onClick: () => { state.name = nameIn.value.trim() || state.name; save(); toast('Name gespeichert'); } }, 'Name speichern')),
       h('div', { class: 'row left' },
         h('span', { class: 'muted' }, 'Grafik:'),
-        ...[['auto', '⚙️ Automatisch'], ['low', '🔋 Sparmodus (ältere iPads)'], ['high', '✨ Volle Grafik']].map(([v, label]) => h('button', {
-          type: 'button', class: 'btn small' + ((state.perf || 'auto') === v ? ' primary' : ''),
+        ...[['auto', 'settings', 'Automatisch'], ['low', 'battery-low', 'Sparmodus'], ['high', 'sparkles', 'Volle Grafik']].map(([v, ic, label]) => h('button', {
+          type: 'button', class: 'btn small' + ((state.perf || 'auto') === v ? ' primary' : ''), title: v === 'low' ? 'Für ältere iPads' : null,
           onClick: () => { state.perf = v; if (v === 'auto') state.perfAuto = null; save(); applySettings(); renderParents(); },
-        }, label))),
+        }, ...withIcon(ic, label)))),
       h('div', { class: 'row left' },
-        h('button', { type: 'button', class: 'btn', onClick: (e) => { state.sound = !state.sound; save(); applySettings(); e.target.textContent = state.sound ? '🔊 Töne an' : '🔇 Töne aus'; } }, state.sound ? '🔊 Töne an' : '🔇 Töne aus'),
-        h('button', { type: 'button', class: 'btn', onClick: (e) => { state.music = !state.music; save(); applySettings(); if (state.music) music('space'); e.target.textContent = state.music ? '🎵 Musik an' : '🔇 Musik aus'; } }, state.music ? '🎵 Musik an' : '🔇 Musik aus'),
+        h('button', { type: 'button', class: 'btn', onClick: (e) => { state.sound = !state.sound; save(); applySettings(); e.currentTarget.replaceChildren(...soundLabel()); } }, ...soundLabel()),
+        h('button', { type: 'button', class: 'btn', onClick: (e) => { state.music = !state.music; save(); applySettings(); if (state.music) music('space'); e.currentTarget.replaceChildren(...musicLabel()); } }, ...musicLabel()),
         h('button', {
           type: 'button', class: 'btn danger',
           onClick: () => modal([
@@ -1210,7 +1216,7 @@ function renderParents() {
             h('p', {}, 'Sterne, Kristalle, Zahlenwesen, Geschichte und Stufen werden gelöscht.'),
             h('button', { type: 'button', class: 'btn danger', onClick: (e) => { e.target.closest('.overlay').remove(); resetState(); applySettings(); renderWelcome(); } }, 'Ja, neu starten'),
           ]),
-        }, '🗑️ Fortschritt löschen')),
+        }, ...withIcon('trash-2', 'Fortschritt löschen'))),
       h('p', { class: 'muted' }, `Missionen gespielt: ${state.missions}`),
       h('div', { class: 'row' }, backBtn())));
 }
@@ -1219,7 +1225,9 @@ function renderParents() {
 
 applySettings();
 starfield();
-if (state.name) renderMap(); else renderWelcome();
+// Wait briefly for the UI font so canvas labels in space are drawn with it (max. 0.8 s, then fallback).
+const fontReady = document.fonts ? Promise.race([document.fonts.load('700 21px Outfit'), new Promise((r) => setTimeout(r, 800))]) : Promise.resolve();
+fontReady.catch(() => {}).then(() => { if (state.name) renderMap(); else renderWelcome(); });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));

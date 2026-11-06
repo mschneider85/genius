@@ -98,11 +98,11 @@ export default {
         dead = true;
         bossEl.textContent = '💥';
         const lost = MAX_HEARTS - hearts;
-        api.solved({ stars: lost === 0 ? 3 : lost === 1 ? 2 : 1, msg: `${boss.n} ist besiegt! 🎉` });
+        api.solved({ stars: lost === 0 ? 3 : lost === 1 ? 2 : 1, msg: `${boss.n} ist besiegt!` });
         return;
       }
-      if (combo >= 5) api.toast(`🔥 Combo ${combo}! Extra-Schaden!`, 'good', 1200);
-      else if (fast) api.toast('⚡ Blitzschnell! Doppelter Schaden!', 'good', 1200);
+      if (combo >= 5) api.toast(`Combo ${combo}! Extra-Schaden!`, 'good', 1200);
+      else if (fast) api.toast('Blitzschnell! Doppelter Schaden!', 'good', 1200);
       newQ();
     }
 
