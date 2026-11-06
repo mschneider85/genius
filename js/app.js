@@ -1253,6 +1253,12 @@ starfield();
 const fontReady = document.fonts ? Promise.race([document.fonts.load('700 21px Outfit'), new Promise((r) => setTimeout(r, 800))]) : Promise.resolve();
 fontReady.catch(() => {}).then(() => { if (state.name) renderMap(); else renderWelcome(); });
 
+// No zooming on iPad: Safari ignores user-scalable=no in the browser, so block its pinch gestures,
+// two-finger moves and double-tap zoom directly. Single fast taps (keypad) are unaffected.
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }

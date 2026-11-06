@@ -164,8 +164,6 @@ export function createWorld(root, cfg) {
   // Controls hint matching the device: touch (iPad), mouse, and/or a hardware keyboard.
   const hint = cfg.tutorial ? h('div', { class: 'world-hint' }, controlHints().flatMap((line, i) => (i ? [h('br'), line] : [line]))) : null;
   root.append(canvas, minimap, prompt, hint);
-  // iPad Safari: pinch gestures would zoom the whole page instead of steering.
-  root.addEventListener('gesturestart', (e) => e.preventDefault());
   if (hint) setTimeout(() => hint.classList.add('gone'), 9000);
   const mctx = minimap.getContext('2d');
 
