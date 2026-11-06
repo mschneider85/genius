@@ -167,7 +167,7 @@ function renderWelcome() {
   setScene('space');
   screen(h('section', { class: 'panel welcome' },
     h('div', { class: 'logo' }, h('span', { class: 'logo-planet' }, '🪐'), h('h1', {}, 'Genius'), h('p', { class: 'sub' }, 'Die Sternenakademie')),
-    h('p', {}, 'Der Chaos-Nebel hat die Galaxie Numeria durcheinandergewirbelt! Pyramiden sind eingestürzt, Roboter sprechen nur noch in Lichtern und ein riesiger Asteroid rast heran. Nur ein schlauer Kopf mit Mathe-Power kann die Planeten retten.'),
+    h('p', {}, 'Der Chaos-Nebel hat die Galaxie Numeria durcheinandergewirbelt. Rette die Planeten mit Mathe-Power!'),
     h('label', { class: 'lbl' }, 'Wie heißt du, Kadett?'), nameIn,
     h('label', { class: 'lbl' }, 'Wähle deinen Avatar'), avatarRow,
     h('label', { class: 'lbl' }, 'Wo startest du? (Das Spiel passt sich danach von selbst an dich an.)'), gradeRow,
@@ -213,7 +213,7 @@ function piAdvice() {
   }
   const story = unlocked.filter((g) => STORY_PLANETS.includes(g.id));
   const damaged = story.filter((g) => stageOf(g.id) === 0).sort((a, b) => points(b.id) - points(a.id))[0];
-  if (damaged) return { text: `${info(damaged).name} ist noch beschädigt: ${REPAIRED - points(damaged.id)} Rettungspunkte bis zur Reparatur. Jedes fehlerfreie Rätsel bringt 2 Punkte!`, target: damaged.id };
+  if (damaged) return { text: `${info(damaged).name}: noch ${REPAIRED - points(damaged.id)} Punkte bis zur Reparatur. Fehlerfreie Rätsel bringen 2.`, target: damaged.id };
   const locked = GAME_LIST.filter((g) => !isUnlocked(g)).sort((a, b) => a.unlock - b.unlock)[0];
   if (locked) return { text: `Sammle noch ${locked.unlock - state.stars} ⭐ – dann fällt der Schutzschild von ${info(locked).name}.`, target: locked.id };
   const shine = story.filter((g) => stageOf(g.id) === 1).sort((a, b) => points(b.id) - points(a.id))[0];
@@ -518,7 +518,7 @@ function renderFinale() {
     h('section', { class: 'panel planet-intro briefing fortress-intro' },
       h('div', { class: 'orb fortress-orb' }, h('span', {}, G.fortress.e)),
       h('h1', {}, G.fortress.n),
-      h('p', {}, `${v.e} ${v.n} wartet ${G.fortress.where}. Zuerst schickt ${v.n} dir 4 Rätsel von den Planeten entgegen – dann kommt der Endkampf im Blitzrechnen gegen ${G.bossHp} Lebenspunkte.`),
+      h('p', {}, `${v.e} ${v.n} wartet ${G.fortress.where}. Erst 4 Planeten-Rätsel, dann der Endkampf im Blitzrechnen.`),
       state.finales[state.galaxy] ? h('p', { class: 'callout' }, 'Schon einmal besiegt – aber ein Rückkampf geht immer!') : null,
       h('div', { class: 'row' },
         backBtn(),
@@ -1041,7 +1041,7 @@ function renderLog() {
     topbar(),
     h('section', { class: 'panel' },
       h('h1', {}, '📜 Logbuch'),
-      h('p', {}, 'Hier sammelt Professor Pi alle Funksprüche, Botschaften und Kapitel deiner Reise. Tippe einen Eintrag an, um ihn noch einmal zu erleben.'),
+      h('p', {}, 'Alle Funksprüche, Botschaften und Kapitel deiner Reise. Tippe einen an, um ihn noch mal zu erleben.'),
       sections,
       h('div', { class: 'row' }, backBtn())));
 }
@@ -1059,7 +1059,7 @@ function renderCollection() {
     topbar(),
     h('section', { class: 'panel' },
       h('h1', {}, '🥚 Zahlenwesen'),
-      h('p', {}, 'Nach jeder zweiten Mission schlüpft ein neues Zahlenwesen. Jedes verrät dir ein Geheimnis der Mathematik. Die mit ☄️ bringen nur Knobel-Kometen.'),
+      h('p', {}, 'Nach jeder zweiten Mission schlüpft ein Zahlenwesen. ☄️-Wesen gibt es nur bei Knobel-Kometen.'),
       h('div', { class: 'creatures' }, CREATURES.map((c) => {
         const owned = state.creatures.includes(c.id);
         return h('button', {
@@ -1114,7 +1114,7 @@ function renderShop() {
     topbar(),
     h('section', { class: 'panel' },
       h('h1', {}, '🛠️ Werft'),
-      h('p', {}, 'Hier tauschst du Kristalle gegen neue Schiffe und Farben. Aber Achtung: Die Werft-Roboterin will, dass du selbst ausrechnest, was übrig bleibt!'),
+      h('p', {}, 'Tausche Kristalle gegen Schiffe, Farben und Module. Das Wechselgeld rechnest du selbst aus!'),
       h('h3', {}, 'Schiffs-Module (verbessern dein Spiel)'),
       h('div', { class: 'shop' }, MODULES.map(moduleItem)),
       h('h3', {}, 'Raumschiffe'),
@@ -1184,17 +1184,11 @@ function renderParents() {
     topbar(),
     h('section', { class: 'panel parents' },
       h('h1', {}, '👪 Für Eltern & Lehrkräfte'),
-      h('p', {}, 'Genius ist für Kinder gedacht, denen der Schulstoff zu leicht ist. Statt nur schneller dasselbe zu rechnen, öffnet das Spiel neue Themen (Anreicherung): Primfaktoren, Binärzahlen, Gleichungen mit Unbekannten, magische Quadrate, Zahlenfolgen, Brüche, Fläche und Umfang, Kopfrechnen unter Zeitdruck.'),
-      h('ul', {},
-        h('li', {}, 'Das Kind steuert ein Raumschiff frei durch eine Weltraum-Welt (Finger gedrückt halten, Planet antippen oder Pfeiltasten) und landet auf den Planeten. Im Hintergrund läuft live erzeugte Musik; sie lässt sich unten abschalten.'),
-        h('li', {}, 'Eine Geschichte in zwei Galaxien trägt das Spiel: Jeder Planet wird durch gelöste Rätsel erst repariert, dann strahlend. Reparierte Planeten liefern Geheimbotschaften, die mit Rechenaufgaben entschlüsselt werden. Alle acht Botschaften führen zum Finale. Danach öffnet sich eine zweite Galaxie, in der alle Planeten mindestens auf Stufe 15 beginnen.'),
-        h('li', {}, 'Jeder Planet hat eigene Stufen (1–40). Zwei fehlerfreie Rätsel in Folge heben die Stufe, viele Fehler senken sie. Eine fehlerfreie Mission gibt einen Extra-Sprung.'),
-        h('li', {}, 'Mit „⚡ Zu leicht!“ springt das Kind jederzeit 3 Stufen nach oben – ohne Strafe. So muss sich niemand langweilen.'),
-        h('li', {}, 'Rätsel werden zufällig erzeugt; es gibt also immer neue Aufgaben. Ein 💡 Tipp ist jederzeit kostenlos; nach zwei Fehlversuchen meldet sich Professor Pi von selbst.'),
-        h('li', {}, 'Knobel-Kometen (einmal täglich und zufällig nach Missionen) bringen freiwillige Logikrätsel, die es auf keinem Planeten gibt: Zahlen-Detektiv, Rechen-Käfige (KenKen) und Streichholzrätsel. Sie haben eine eigene, mitwachsende Schwierigkeit, drei gestufte Tipps und blockieren nie die Geschichte.'),
-        h('li', {}, 'In jeder Mission duelliert sich das Kind mit dem Widersacher: Fehler kosten Lebensenergie, gelöste Rätsel schwächen den Gegner. Wer verliert, kann sofort mit voller Energie neu starten. Combos, Tagesaufträge, Abzeichen, Schatztruhen und Schiffs-Module sorgen für langfristige Ziele.'),
-        h('li', {}, 'Für ältere iPads gibt es einen Sparmodus (unten bei „Grafik“). Im Automatik-Modus schaltet das Spiel ihn selbst ein, wenn es ruckelt.'),
-        h('li', {}, 'Alle Daten bleiben auf diesem Gerät (localStorage). Keine Werbung, kein Tracking, keine Konten. Nach dem ersten Laden funktioniert das Spiel offline und lässt sich als App installieren.')),
+      h('p', {}, 'Für Kinder, denen Mathe zu leicht ist: neue Themen statt nur schneller rechnen.'),
+      h('ul', { class: 'parents-facts' },
+        h('li', {}, '🎯 Passt sich an: jeder Planet hat Stufen 1–40, „⚡ Zu leicht!“ springt sofort 3 hoch.'),
+        h('li', {}, '💡 Hilfe ohne Strafe: Tipps sind kostenlos, nach einer Niederlage geht es sofort weiter.'),
+        h('li', {}, '🔒 Keine Werbung, kein Tracking, kein Konto. Alles bleibt auf diesem Gerät, auch offline.')),
       h('h3', {}, 'Stufen anpassen'),
       h('table', { class: 'levels' }, h('tbody', {}, rows)),
       h('h3', {}, 'Einstellungen'),

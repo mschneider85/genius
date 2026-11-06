@@ -29,7 +29,7 @@ export default {
   hue: 20,
   unlock: 0,
   rounds: 5,
-  intro: 'Die Tempel von Pyramidia sind eingestürzt! Ihre Steine folgen einem uralten Gesetz: Jeder Stein ist die Summe der beiden Steine direkt darunter. Setze die fehlenden Steine ein – manchmal musst du rückwärts denken!',
+  intro: 'Jeder Stein ist die Summe der zwei Steine darunter. Setze die fehlenden Steine ein – manchmal rückwärts!',
   hint: 'Stein oben = linker Stein unten + rechter Stein unten. Fehlt unten ein Stein? Dann rechne: oberer Stein − Nachbarstein. Fang dort an, wo du schon zwei von drei Steinen kennst.',
 
   create(stage, L, api) {

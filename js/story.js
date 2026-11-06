@@ -172,7 +172,7 @@ const INFINITAS = {
   planets: {
     pyramid: {
       name: 'Turmalin', emoji: '🗼',
-      intro: 'Auf Turmalin stehen die höchsten Zahlentürme des Alls. Königin Nulla hat Steine ins Nichts verschwinden lassen. Die Türme sind höher als auf Pyramidia – und es fehlen mehr Steine!',
+      intro: 'Höhere Zahlentürme als auf Pyramidia – und es fehlen mehr Steine!',
       npc: { e: '🦒', n: 'Turmwächterin Hochstapel' },
       radio: [
         ['npc', 'Hier Hochstapel, Turmwächterin von Turmalin! Unsere Türme haben Löcher – die Steine sind einfach … weg! Ins Nichts!'],
@@ -185,7 +185,7 @@ const INFINITAS = {
     },
     sequence: {
       name: 'Spiralia', emoji: '🌀',
-      intro: 'Im Spiralnebel Spiralia drehen sich Zahlenfolgen endlos im Kreis. Nulla hat Glieder herausgerissen. Die Muster hier sind wilder als auf dem Code-Kometen.',
+      intro: 'Die Zahlenmuster hier sind wilder als auf dem Code-Kometen.',
       npc: { e: '🐚', n: 'Muschelmeisterin Spira' },
       radio: [
         ['npc', 'Hallo, hier ist Spira! Unsere Spiralen wachsen nach Zahlenmustern – 1, 1, 2, 3, 5, 8 … Aber Nulla hat Löcher hineingefressen!'],
@@ -198,7 +198,7 @@ const INFINITAS = {
     },
     asteroid: {
       name: 'Primwüste', emoji: '🏜️',
-      intro: 'In der Primwüste liegen riesige Zahlenfelsen. Nur wer sie in Primzahlen zerlegt, findet die Oase. Die Felsen hier sind viel größer!',
+      intro: 'Riesige Zahlenfelsen: Zerlege sie in Primzahlen.',
       npc: { e: '🦂', n: 'Skorpion Teilo' },
       radio: [
         ['npc', 'Psst! Skorpion Teilo hier. Nulla hat unsere Oase unter Felsen begraben. Zerlegt sie – aber nur mit dem richtigen Laser!'],
@@ -211,7 +211,7 @@ const INFINITAS = {
     },
     scale: {
       name: 'Libra-Station', emoji: '🛰️',
-      intro: 'Auf der Libra-Station wiegt man mit riesigen Doppelwaagen. Nulla hat die Gewichte vertauscht – hier gibt es oft zwei Unbekannte auf einmal.',
+      intro: 'Doppelwaagen mit oft zwei Unbekannten auf einmal.',
       npc: { e: '🦩', n: 'Flamingo Libby' },
       radio: [
         ['npc', 'Flamingo Libby hier! Ich stehe auf einem Bein, weil alles so wackelt! Nulla hat unsere Waagen verhext.'],
@@ -224,7 +224,7 @@ const INFINITAS = {
     },
     binary: {
       name: 'Oktavia', emoji: '🐙',
-      intro: 'Auf Oktavia lebt ein riesiger Krake mit 8 Armen – jeder hält eine Lampe. Mit 8 Lampen kann man bis 255 zählen!',
+      intro: 'Mit 8 Lampen kann man bis 255 zählen!',
       npc: { e: '🐙', n: 'Krake Oktavia' },
       radio: [
         ['npc', 'Blubb! Krake Oktavia hier. Nulla hat alle meine 8 Lampen ausgeknipst. Ohne Licht finde ich nicht mal meine eigenen Arme!'],
@@ -237,7 +237,7 @@ const INFINITAS = {
     },
     magic: {
       name: 'Runenhain', emoji: '🌳',
-      intro: 'Im Runenhain wachsen magische Quadrate an den Bäumen. Nulla hat die Zaubersummen verschwinden lassen – hier musst du sie oft selbst finden.',
+      intro: 'Die Zaubersumme ist verschwunden – oft musst du sie selbst finden.',
       npc: { e: '🧝', n: 'Runenelfe Magna' },
       radio: [
         ['npc', 'Seid gegrüßt. Ich bin Magna. Unsere Zauberquadrate sind verblasst, und ihre Zaubersummen sind verschwunden.'],
@@ -250,7 +250,7 @@ const INFINITAS = {
     },
     fraction: {
       name: 'Krümelstern', emoji: '🧁',
-      intro: 'Auf dem Krümelstern backt man Sternentorten. Nulla hat die Rezepte durchlöchert – hier vergleichst und addierst du Brüche und berechnest Anteile.',
+      intro: 'Brüche vergleichen, addieren und Anteile berechnen.',
       npc: { e: '🐭', n: 'Mäusekoch Krümel' },
       radio: [
         ['npc', 'Piep! Mäusekoch Krümel hier. Nulla hat aus allen Torten Stücke verschwinden lassen. Wie viel ist noch übrig?'],
@@ -263,7 +263,7 @@ const INFINITAS = {
     },
     builder: {
       name: 'Polygonia', emoji: '💎',
-      intro: 'Polygonia ist eine Stadt aus Kristallen. Nulla hat ganze Viertel gelöscht. Hier baust du kniffligere Formen: gleiche Fläche, ganz anderer Umfang!',
+      intro: 'Knifflige Formen: gleiche Fläche, ganz anderer Umfang!',
       npc: { e: '🦔', n: 'Baumeisterin Stachel' },
       radio: [
         ['npc', 'Baumeisterin Stachel hier! Nulla hat unsere Kristallstadt ausradiert. Wir brauchen neue Plätze – genau nach Plan!'],
@@ -276,7 +276,7 @@ const INFINITAS = {
     },
     duel: {
       name: 'Nichts-Wächter', emoji: '👻',
-      intro: 'Nullas Nichts-Wächter frisst Zahlen, wenn man zu langsam ist. Jede richtige Antwort trifft ihn, schnelle Antworten doppelt!',
+      intro: 'Jede richtige Antwort trifft den Nichts-Wächter, schnelle doppelt!',
       boss: { e: '👻', n: 'Nichts-Wächter', hp: 12 },
       radio: [
         ['ally', 'Das ist Nullas Nichts-Wächter. Er frisst Zahlen, wenn man zu langsam ist!'],

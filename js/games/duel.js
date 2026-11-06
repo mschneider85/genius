@@ -54,7 +54,7 @@ export default {
   hue: 350,
   unlock: 20,
   rounds: 1,
-  intro: 'Im Herzen des Chaos-Nebels lauert der Chaos-Kern! Jede richtige Antwort feuert deinen Laser ab. Bist du blitzschnell, richtest du doppelten Schaden an. Aber Vorsicht: Wenn die Ladeleiste voll ist, schlägt der Kern zurück!',
+  intro: 'Jede richtige Antwort trifft den Chaos-Kern, schnelle doppelt. Ist seine Ladeleiste voll, schlägt er zurück!',
   hint: 'Rechentricks: · 5 ist die Hälfte von · 10. · 9 ist · 10 minus einmal die Zahl. Punkt vor Strich: Erst mal und geteilt, dann plus und minus. Klammern zuerst!',
 
   create(stage, L, api) {

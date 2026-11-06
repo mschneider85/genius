@@ -108,8 +108,8 @@ export default {
   hue: 120,
   unlock: 15,
   rounds: 5,
-  intro: 'Auf Geometra baust du Landeplätze für Raumschiffe. Die Fläche ist die Anzahl der Kästchen. Der Umfang ist die Länge des Zauns rundherum – zähle alle Kästchenseiten am Rand. Jede Bauanfrage hat viele Lösungen. Finde eine!',
-  hint: 'Fläche = Anzahl der Kästchen. Umfang = Anzahl der Kästchenseiten am Rand. Lange, dünne Formen haben einen großen Umfang, kompakte (quadratische) Formen einen kleinen. Ein Rechteck mit Breite b und Höhe h hat den Umfang b + h + b + h.',
+  intro: 'Baue Landeplätze: Fläche = Anzahl der Kästchen, Umfang = Kästchenseiten am Rand.',
+  hint: 'Fläche: Kästchen zählen. Umfang: Kästchenseiten am Rand zählen. Lange, dünne Formen haben mehr Umfang als quadratische.',
 
   create(stage, L, api) {
     const mode = pickMode(L);

@@ -317,6 +317,7 @@ input[type='text'] {
 .shop-item.sel { border-color: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
 
 /* Eltern */
+.parents-facts { list-style: none; padding: 0; display: grid; gap: 6px; }
 .levels { border-collapse: collapse; width: 100%; max-width: 640px; }
 .levels td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .lvcell { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }

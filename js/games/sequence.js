@@ -52,7 +52,7 @@ export default {
   hue: 195,
   unlock: 0,
   rounds: 5,
-  intro: 'Der Code-Komet funkt geheime Zahlencodes durchs All. Hinter jedem Code steckt eine Regel. Knacke die Regel und finde die fehlende Zahl – dann öffnet sich das Sternentor!',
+  intro: 'Hinter jedem Zahlencode steckt eine Regel. Finde sie und ergänze die fehlende Zahl.',
   hint: 'Schau dir die Abstände zwischen den Zahlen an: Wird immer gleich viel dazugezählt? Wird verdoppelt? Wachsen die Abstände? Manchmal hilft es, zwei Zahlen davor zusammenzuzählen.',
 
   create(stage, L, api) {

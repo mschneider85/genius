@@ -86,7 +86,7 @@ export default {
   hue: 280,
   unlock: 3,
   rounds: 5,
-  intro: 'Auf dem Waagen-Mond werden geheimnisvolle Kisten, Dreiecke und Kugeln gewogen. Alle Waagen sind im Gleichgewicht. Finde heraus, wie schwer die geheimen Dinge sind – so wie echte Algebra-Profis!',
+  intro: 'Alle Waagen sind im Gleichgewicht. Finde heraus, wie schwer die geheimen Dinge sind.',
   hint: 'Eine Waage im Gleichgewicht bleibt im Gleichgewicht, wenn du auf beiden Seiten das Gleiche wegnimmst.',
 
   create(stage, L, api) {

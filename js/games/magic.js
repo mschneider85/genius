@@ -33,7 +33,7 @@ export default {
   hue: 310,
   unlock: 9,
   rounds: 5,
-  intro: 'Auf Magica gibt es Zauberquadrate: In jeder Zeile, jeder Spalte und auf beiden Diagonalen ergeben die drei Zahlen dieselbe Zaubersumme. Der Chaos-Nebel hat Zahlen gestohlen – zaubere sie zurück!',
+  intro: 'In jeder Zeile, Spalte und Diagonale ergeben die Zahlen dieselbe Zaubersumme. Ergänze die fehlenden!',
   hint: 'Suche eine Reihe (waagrecht, senkrecht oder schräg), in der nur eine Zahl fehlt: Zaubersumme minus die zwei bekannten Zahlen. Kennst du die Zaubersumme nicht? Addiere eine volle Reihe!',
 
   create(stage, L, api) {

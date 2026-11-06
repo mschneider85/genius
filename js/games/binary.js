@@ -9,7 +9,7 @@ export default {
   hue: 160,
   unlock: 6,
   rounds: 5,
-  intro: 'Die Roboter von Binärion sprechen nur mit Lichtern: Jede Lampe hat einen Wert – 1, 2, 4, 8, 16 … Brennt sie, zählt ihr Wert. Genau so rechnen auch echte Computer! Lerne die Robotersprache.',
+  intro: 'Jede Lampe hat einen Wert: 1, 2, 4, 8 … Brennende Lampen zählen. So rechnen auch Computer!',
   hint: 'Jede Lampe ist doppelt so viel wert wie die rechts daneben. Für eine Zahl: Beginne links bei der größten Lampe, die noch passt, zieh sie ab und mach mit dem Rest weiter.',
 
   create(stage, L, api) {

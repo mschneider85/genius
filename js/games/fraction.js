@@ -29,7 +29,7 @@ export default {
   hue: 45,
   unlock: 12,
   rounds: 5,
-  intro: 'Die Energiekerne der Bruchstation sind in gleich große Stücke geteilt. Lade genau die richtige Menge Energie – nicht zu viel und nicht zu wenig! Hier lernst du, wie Brüche funktionieren.',
+  intro: 'Lade genau den richtigen Bruchteil des Energiekerns – nicht zu viel, nicht zu wenig.',
   hint: 'Der Bruch 3/4 bedeutet: Teile das Ganze in 4 gleiche Teile und nimm 3 davon. Ist der Kern in mehr Stücke geteilt, z. B. 8, dann sind 3/4 = 6/8.',
 
   create(stage, L, api) {

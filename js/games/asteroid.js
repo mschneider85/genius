@@ -8,7 +8,7 @@ export default {
   hue: 30,
   unlock: 0,
   rounds: 5,
-  intro: 'Riesige Asteroiden rasen auf die Station zu! Dein Laser kann sie teilen – aber nur, wenn die Zahl genau aufgeht. Zerlege jeden Asteroiden, bis nur noch unzerbrechliche Primzahl-Kristalle übrig sind.',
+  intro: 'Teile die Asteroiden mit deinem Laser, bis nur noch Primzahl-Kristalle übrig sind.',
   hint: 'Teilbarkeitsregeln: Gerade Zahl → ÷2 geht. Quersumme durch 3 teilbar → ÷3 geht. Endet auf 0 oder 5 → ÷5 geht. Primzahlen (2, 3, 5, 7, 11, 13 …) kann man nicht weiter zerlegen.',
 
   create(stage, L, api) {
