@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Genius – Sternenakademie</title>
+  <meta name="description" content="Mathe-Weltraumabenteuer für neugierige und schlaue Grundschulkinder (Klasse 1–4).">
+  <meta name="theme-color" content="#0b1026">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Genius">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="nebula">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <main id="app"></main>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript><p style="color:#fff;padding:2rem">Bitte JavaScript aktivieren, um Genius zu spielen.</p></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

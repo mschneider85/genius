@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="20%" r="90%">
+      <stop offset="0" stop-color="#4b1d6e"/><stop offset="1" stop-color="#0b1026"/>
+    </radialGradient>
+    <radialGradient id="pl" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#ffe7a3"/><stop offset=".5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#8a1f5c"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g fill="#fff">
+    <circle cx="90" cy="110" r="5"/><circle cx="420" cy="90" r="4"/><circle cx="440" cy="400" r="5"/>
+    <circle cx="70" cy="380" r="3"/><circle cx="380" cy="190" r="3"/><circle cx="140" cy="440" r="4"/>
+  </g>
+  <ellipse cx="256" cy="270" rx="200" ry="56" fill="none" stroke="#7ad7ff" stroke-width="18" transform="rotate(-18 256 270)" opacity=".55"/>
+  <circle cx="256" cy="262" r="130" fill="url(#pl)"/>
+  <path d="M56 270 A200 56 0 0 0 456 270" fill="none" stroke="#7ad7ff" stroke-width="18" transform="rotate(-18 256 270)" opacity=".95"/>
+  <text x="256" y="312" text-anchor="middle" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-weight="900" font-size="140" fill="#2b0f3a">π</text>
+</svg>
