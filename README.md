@@ -30,7 +30,7 @@ Jeder Planet ist ein eigenes Rätselspiel mit einem Thema, das weit über den Le
 **Professor Pi** 🦉 begleitet das Kind. Er erzählt die Geschichte und meldet sich mit Tipps, sobald in einem Rätsel zwei Fehler passiert sind.
 
 1. **Prolog:** Graf Wirrwarr 🦹 hat Numeria durcheinandergewirbelt. Beim ersten Besuch eines Planeten meldet sich dessen Bewohner per **Funkspruch**.
-2. **Kapitel:** Jeder Planet wird über Rettungspunkte gerettet (fehlerfreies Rätsel = 2, sonst 1). Bei 10 Punkten ist er *repariert*, bei 25 *strahlend*. Den Zustand zeigt die Karte an. Jede Stufe endet mit einer kurzen Szene.
+2. **Kapitel:** Jeder Planet wird über Rettungspunkte gerettet (fehlerfreies Rätsel = 2, sonst 1). Bei 15 Punkten ist er *repariert*, bei 35 *strahlend*. Den Zustand zeigt die Karte an. Jede Stufe endet mit einer kurzen Szene.
 3. **Geheimbotschaften:** Nach jeder Reparatur schickt der Bösewicht eine verschlüsselte Botschaft. Jeder Buchstabe versteckt sich hinter einer Rechenaufgabe zum Thema des Planeten (A=1 … Z=26). Jede geknackte Botschaft liefert ein Koordinaten-Stück.
 4. **Finale:** Mit allen 8 Stücken öffnet sich die Festung. Dort warten 4 Planetenrätsel und danach ein Endkampf gegen den Bösewicht. Es folgen Schlussszene und Abspann.
 5. **Galaxie 2 – Infinitas:** Neue Planetennamen, neue Bewohner, eine neue Gegenspielerin (Königin Nulla 🌑), Wirrwarr als Verbündeter. Alle Planeten beginnen dort mindestens auf Stufe 15. Am Ende steht der Titel „Genius“.

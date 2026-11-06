@@ -33,7 +33,7 @@ export default {
   hint: 'Stein oben = linker Stein unten + rechter Stein unten. Fehlt unten ein Stein? Dann rechne: oberer Stein − Nachbarstein. Fang dort an, wo du schon zwei von drei Steinen kennst.',
 
   create(stage, L, api) {
-    const rows = L <= 3 ? 3 : L <= 9 ? 4 : L <= 18 ? (Math.random() < 0.5 ? 4 : 5) : 5;
+    const rows = L <= 5 ? 3 : L <= 9 ? 4 : L <= 18 ? (Math.random() < 0.5 ? 4 : 5) : 5;
     const maxB = Math.min(3 + L * 2, 80);
     const g = [Array.from({ length: rows }, () => rnd(1, maxB))];
     for (let r = 1; r < rows; r++) {
@@ -44,10 +44,12 @@ export default {
     for (let r = 0; r < rows; r++) for (let i = 0; i < rows - r; i++) all.push(key(r, i));
 
     let hidden = new Set();
-    if (L <= 3) {
+    if (L <= 1) {
       all.filter((k) => !k.startsWith('0,')).forEach((k) => hidden.add(k));
     } else {
-      const target = Math.min(all.length - rows, Math.round(all.length * (0.4 + L * 0.012)));
+      // A pyramid has `rows` degrees of freedom, so at most all.length - rows bricks can be hidden.
+      // Small pyramids (L2–5) hide 3 incl. one bottom brick, so the child has to subtract once.
+      const target = rows === 3 ? 3 : Math.min(8, all.length - rows, Math.round(all.length * (0.4 + L * 0.008)));
       const bottom = key(0, rnd(0, rows - 1));
       const order = [bottom, ...shuffle(all.filter((k) => k !== bottom))];
       for (const k of order) {

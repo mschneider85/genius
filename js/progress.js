@@ -1,6 +1,7 @@
 // Langzeit-Motivation: Statistik, Tagesaufträge, Abzeichen und Schiffs-Module.
 import { pick, shuffle, localDay } from './util.js';
 import { state, save } from './state.js';
+import { CREATURES } from './creatures.js';
 
 export const today = () => localDay();
 export const stat = (k) => state.stats[k] || 0;
@@ -11,7 +12,7 @@ const inc = (k, n = 1) => { state.stats[k] = stat(k) + n; };
 /* ------------------------------------------------------------------ */
 
 export const MODULES = [
-  { id: 'shield', icon: 'shield', n: 'Schutzschild', prices: [120, 260, 450], d: (L) => `+${L} Herz${L > 1 ? 'en' : ''} im Bosskampf` },
+  { id: 'shield', icon: 'shield', n: 'Schutzschild', prices: [120, 260, 450], d: (L) => `+${L} Leben in Missionen und +${L} Herz${L > 1 ? 'en' : ''} im Bosskampf` },
   { id: 'time', icon: 'hourglass', n: 'Zeitkristall', prices: [100, 220, 400], d: (L) => `Bosse laden ${L * 15} % langsamer` },
   { id: 'laser', icon: 'crosshair', n: 'Laser-Verstärker', prices: [100, 220, 400], d: (L) => `Längeres Zeitfenster für Blitz-Treffer (+${L * 30} %)` },
   { id: 'turbo', icon: 'gauge', n: 'Turbo-Triebwerk', prices: [80, 180, 320], d: (L) => `+${L * 20} % Fluggeschwindigkeit` },
@@ -19,6 +20,9 @@ export const MODULES = [
   { id: 'magnet', icon: 'magnet', n: 'Splitter-Magnet', prices: [90, 200], d: (L) => `Sammelradius +${L * 60} %` },
 ];
 export const mod = (id) => state.modules[id] || 0;
+/** True while an egg can still hatch into a new (non-comet) creature. */
+export const eggsUseful = () => CREATURES.some((c) => !c.comet && !state.creatures.includes(c.id));
+const EGG_GEMS = 20; // replaces an egg once every creature has hatched
 
 /* ------------------------------------------------------------------ */
 /* Tagesaufträge                                                       */
@@ -82,10 +86,11 @@ function advanceQuests(ev, data, out) {
   }
   if (!state.quests.bonus && state.quests.list.every((q) => q.done)) {
     state.quests.bonus = true;
-    state.crystals += BONUS_REWARD;
-    state.eggs = (state.eggs || 0) + 1;
+    const egg = eggsUseful();
+    state.crystals += BONUS_REWARD + (egg ? 0 : EGG_GEMS);
+    if (egg) state.eggs = (state.eggs || 0) + 1;
     inc('questDays');
-    out.push({ icon: 'trophy', title: 'Alle Tagesaufträge geschafft!', text: 'Morgen gibt es neue.', reward: `+${BONUS_REWARD} Kristalle · +1 Ei` });
+    out.push({ icon: 'trophy', title: 'Alle Tagesaufträge geschafft!', text: 'Morgen gibt es neue.', reward: egg ? `+${BONUS_REWARD} Kristalle · +1 Ei` : `+${BONUS_REWARD + EGG_GEMS} Kristalle` });
   }
 }
 
@@ -94,7 +99,7 @@ function advanceQuests(ev, data, out) {
 /* ------------------------------------------------------------------ */
 
 const BADGE_REWARD = 25;
-const maxLevel = () => Math.max(0, ...Object.values(state.levels));
+const maxPlayed = () => stat('maxPlayedL');
 
 export const BADGES = [
   { id: 'first', e: '🚀', n: 'Erster Einsatz', d: 'Schließe deine erste Mission ab.', ok: () => stat('missions') >= 1 },
@@ -115,8 +120,8 @@ export const BADGES = [
   { id: 'shine', e: '🌟', n: 'Strahlemacher', d: 'Bringe einen Planeten zum Strahlen.', ok: () => stat('shining') >= 1 },
   { id: 'finale', e: '🏆', n: 'Retter von Numeria', d: 'Besiege den Bösewicht der ersten Galaxie.', ok: () => state.finales[0] },
   { id: 'genius', e: '🧠', n: 'Genius', d: 'Rette beide Galaxien.', ok: () => state.finales[0] && state.finales[1] },
-  { id: 'lvl20', e: '📈', n: 'Überflieger', d: 'Erreiche Stufe 20 auf einem Planeten.', ok: () => maxLevel() >= 20 },
-  { id: 'lvl40', e: '🏔️', n: 'Gipfelstürmer', d: 'Erreiche Stufe 40.', ok: () => maxLevel() >= 40 },
+  { id: 'lvl20', e: '📈', n: 'Überflieger', d: 'Erreiche Stufe 20 auf einem Planeten.', ok: () => maxPlayed() >= 20 },
+  { id: 'lvl40', e: '🏔️', n: 'Gipfelstürmer', d: 'Erreiche Stufe 40.', ok: () => maxPlayed() >= 40 },
   { id: 'quests', e: '📋', n: 'Tagesheld', d: 'Schaffe alle Tagesaufträge eines Tages.', ok: () => stat('questDays') >= 1 },
   { id: 'streak7', e: '📅', n: 'Dranbleiber', d: 'Spiele 7 Tage hintereinander.', ok: () => state.streak >= 7 },
 ];

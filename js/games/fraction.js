@@ -64,11 +64,12 @@ export default {
     if (mode === 'compare') {
       let a, b, c, d;
       const maxD = L > 15 ? 12 : 10;
-      if (L <= 9) {
+      if (Math.random() < (L <= 9 ? 0.15 : 0.2)) {
+        // Equivalent pair, so '=' is sometimes the right answer.
+        b = rnd(2, L <= 9 ? 4 : 5); a = rnd(1, b - 1); const k = L <= 9 ? 2 : rnd(2, 3); c = a * k; d = b * k;
+      } else if (L <= 9) {
         if (Math.random() < 0.5) { b = d = rnd(3, 8); a = rnd(1, b - 1); do c = rnd(1, b - 1); while (c === a); }
         else { a = c = rnd(1, 3); b = rnd(a + 1, 9); do d = rnd(a + 1, 9); while (d === b); }
-      } else if (Math.random() < 0.2) {
-        b = rnd(2, 5); a = rnd(1, b - 1); const k = rnd(2, 3); c = a * k; d = b * k;
       } else {
         do { b = rnd(2, maxD); d = rnd(2, maxD); a = rnd(1, b - 1); c = rnd(1, d - 1); } while (a * d === c * b);
       }

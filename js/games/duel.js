@@ -8,7 +8,7 @@ const sup = (n) => String(n).split('').map((d) => SUP[d]).join('');
 export function question(L) {
   const R = [];
   let from = 1; // start level of the current tier; tiers far below L appear less often
-  const add = (w, f) => R.push([L - from >= 10 ? w * 0.25 : w, f]);
+  const add = (w, f) => R.push([L - from >= 10 && from < 23 ? w * 0.25 : w, f]); // top tier never fades
   if (L <= 6) {
     add(3, () => { const a = rnd(1, 8 + L * 2); const b = rnd(1, 8 + L * 2); return [`${a} + ${b}`, a + b]; });
     add(2, () => { const a = rnd(5, 10 + L * 3); const b = rnd(1, a); return [`${a} − ${b}`, a - b]; });
@@ -36,6 +36,7 @@ export function question(L) {
     add(1, () => { const n = rnd(26, 250); return [`Hälfte von ${2 * n}`, n]; });
     add(1, () => { const a = rnd(3, 9); const b = rnd(3, 9); const c = rnd(1, a * b); return [`${a} · ${b} − ${c}`, a * b - c]; });
   }
+  from = 23;
   if (L >= 23) {
     add(2, () => { const a = rnd(2, 9); const b = rnd(2, 9); const c = rnd(2, 9); const d = rnd(2, 9); return [`${a} · ${b} + ${c} · ${d}`, a * b + c * d]; });
     add(1, () => { const n = rnd(3, 10); return [`2${sup(n)}`, 2 ** n]; });
@@ -71,8 +72,9 @@ export default {
     let last = 0;
     let raf = 0;
     let dead = false;
-    const T = Math.max(9, 18 - L * 0.2) * 1000 * (1 + 0.15 * (mods.time || 0));
-    const FAST = T * (1 / 3) * (1 + 0.3 * (mods.laser || 0));
+    let misses = 0; // wrong answers on the current question
+    const T = Math.max(12, 20 - 0.2 * L) * 1000 * (1 + 0.15 * (mods.time || 0));
+    const FAST = T * 0.4 * (1 + 0.3 * (mods.laser || 0));
 
     const bossEl = h('div', { class: 'boss' }, boss.e);
     const hpFill = h('div', { class: 'hpfill' });
@@ -82,7 +84,7 @@ export default {
     const tFill = h('div', { class: 'dtfill' });
 
     const drawHearts = () => { heartsEl.textContent = '❤️'.repeat(hearts) + '🖤'.repeat(MAX_HEARTS - hearts); };
-    const newQ = () => { q = question(L); qStart = performance.now(); val = ''; qEl.textContent = `${q.q} =`; ansEl.textContent = '?'; };
+    const newQ = () => { q = question(L); qStart = performance.now(); val = ''; misses = 0; qEl.textContent = `${q.q} =`; ansEl.textContent = '?'; };
 
     function hitBoss() {
       const fast = performance.now() - qStart < FAST;
@@ -107,14 +109,22 @@ export default {
     }
 
     function onKey(k) {
-      if (dead) return;
+      // ignore input while the clock is paused (dialog/cutscene): no free 'fast' hits
+      if (dead || document.querySelector('.overlay, .cutscene')) return;
       if (k === 'back') val = val.slice(0, -1);
       else if (k === 'ok') {
         if (!val) return;
         if (Number(val) === q.a) { hitBoss(); return; }
-        api.wrong('Daneben!');
         combo = 0;
         shake(ansEl);
+        if (++misses >= 3) {
+          api.wrong('Daneben!');
+          api.toast(`Lösung: ${q.q} = ${q.a}`, 'bad', 2400);
+          newQ();
+          return;
+        }
+        api.wrong('Daneben! Das kostet Zeit.');
+        qStart -= T * 0.25; // guessing costs time: the charge bar jumps
         val = '';
       } else if (val.length < 6) val += k;
       ansEl.textContent = val || '?';

@@ -271,6 +271,11 @@ export function createEncounter({ villain, player, rounds, playerMax }) {
         anim(pFace, 'cheer');
       });
     },
+    /** Restore n life points (capped at playerMax). */
+    heal(n) {
+      php = Math.min(playerMax, php + n);
+      draw();
+    },
     taunt(text) { say(vBubble, text, 2600); },
     /** You won: the villain flees. */
     finish() {

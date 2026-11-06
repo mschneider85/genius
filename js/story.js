@@ -4,8 +4,8 @@ import { state, save } from './state.js';
 import { sfx } from './audio.js';
 import { setKeyHandler, getKeyHandler } from './ui.js';
 
-export const REPAIRED = 10; // Rettungspunkte bis „repariert“
-export const SHINING = 25; // Rettungspunkte bis „strahlend“
+export const REPAIRED = 15; // Rettungspunkte bis „repariert“
+export const SHINING = 35; // Rettungspunkte bis „strahlend“
 export const STORY_PLANETS = ['pyramid', 'sequence', 'asteroid', 'scale', 'binary', 'magic', 'fraction', 'builder'];
 export const STAGE_NAMES = ['beschädigt', 'repariert', 'strahlend'];
 

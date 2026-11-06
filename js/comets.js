@@ -39,7 +39,7 @@ function detectiveClues(t, L, lo, hi) {
   if (hi - t > 5) { const b = Math.ceil(rnd(t + 1, hi) / 5) * 5; add(`Ich bin kleiner als ${b}.`, (n) => n < b); }
   const S = qsum(t);
   add(`Meine Quersumme ist ${S}.`, (n) => qsum(n) === S);
-  if (L < 6) add(`Meine Einerziffer ist ${t % 10}.`, (n) => n % 10 === t % 10);
+  if (L < 3) add(`Meine Einerziffer ist ${t % 10}.`, (n) => n % 10 === t % 10);
   if (ds.length === 2) {
     const [z, e] = ds;
     if (z > e) add('Meine Zehnerziffer ist größer als meine Einerziffer.', (n) => Math.floor(n / 10) > n % 10);
@@ -75,8 +75,8 @@ function detectiveClues(t, L, lo, hi) {
 }
 
 export function detectivePuzzle(L) {
-  const lo = L < 16 ? 10 : 100;
-  const hi = L < 16 ? 99 : 999;
+  const lo = L < 20 ? 10 : 100;
+  const hi = L < 20 ? 99 : 999;
   const all = range(lo, hi);
   for (;;) {
     const t = rnd(lo, hi);
@@ -129,7 +129,7 @@ function detective(L, done) {
     solve: () => { givenUp = true; field.textContent = t; field.classList.add('good'); },
   };
 }
-const digitWord = (L) => (L < 16 ? 'zwei' : 'drei');
+const digitWord = (L) => (L < 20 ? 'zwei' : 'drei');
 
 /* ------------------------------------------------------------------ */
 /* Rechen-Käfige (KenKen)                                              */

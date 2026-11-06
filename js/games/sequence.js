@@ -15,7 +15,7 @@ function recur(first, next) {
 const GENS = [
   { min: 1, max: 14, f: (L) => { const d = rnd(1, Math.min(2 + L, 10)); const s = rnd(0, 8 + L * 2); return { seq: arr((n) => s + n * d), rule: `immer +${d}` }; } },
   { min: 2, max: 16, f: (L) => { const d = rnd(1, Math.min(1 + L, 10)); const s = d * 6 + rnd(0, 15 + L * 3); return { seq: arr((n) => s - n * d), rule: `immer −${d}` }; } },
-  { min: 4, f: (L) => { const d = rnd(11, 20 + L * 3); const s = rnd(1, 99); return { seq: arr((n) => s + n * d), rule: `immer +${d}` }; } },
+  { min: 8, f: (L) => { const d = rnd(11, 20 + L * 3); const s = rnd(1, 99); return { seq: arr((n) => s + n * d), rule: `immer +${d}` }; } },
   { min: 4, f: () => { const a = rnd(3, 9); const b = rnd(1, a - 1); const s = rnd(1, 20); return { seq: recur([s], (q) => q[q.length - 1] + (q.length % 2 ? a : -b)), rule: `abwechselnd +${a} und −${b}` }; } },
   { min: 5, f: () => { const s = rnd(1, 5); return { seq: arr((n) => s * 2 ** n), rule: 'immer ×2 (verdoppeln)' }; } },
   { min: 7, f: () => { const s = rnd(1, 10); const k = rnd(1, 3); return { seq: recur([s], (q) => q[q.length - 1] + k + q.length - 1), rule: `die Sprünge wachsen: +${k}, +${k + 1}, +${k + 2} …` }; } },
@@ -38,7 +38,7 @@ const GENS = [
 function generate(L) {
   const eligible = GENS.filter((g) => L >= g.min && (!g.max || L <= g.max));
   for (;;) {
-    const g = weighted(eligible.map((x) => [x.min >= L - 8 ? 3 : 1, x]));
+    const g = weighted(eligible.map((x) => [x.min >= Math.min(L, 24) - 8 ? 3 : 1, x]));
     const res = g.f(L);
     if (res.seq.every((v) => Number.isInteger(v) && v >= 0 && v < 100000)) return res;
   }

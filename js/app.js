@@ -15,7 +15,7 @@ import { makeComet } from './comets.js';
 import { music, setMusic } from './music.js';
 import { createWorld, WORLD_W, WORLD_H } from './world.js';
 import { showScenery, hideScenery, setRepair, setChaos, celebrateScenery, createEncounter } from './scenery.js';
-import { track, ensureQuests, questsOpen, MODULES, mod, BADGES, stat as statOf } from './progress.js';
+import { track, ensureQuests, questsOpen, MODULES, mod, eggsUseful, BADGES, stat as statOf } from './progress.js';
 import { question as mentalTask } from './games/duel.js';
 import { applyPerf } from './perf.js';
 import { PLANET_TYPES, paintPlanet, cachedArt } from './art.js';
@@ -43,9 +43,9 @@ const SHIPS = [
   { id: '🛰️', e: '🛰️', n: 'Satellit', p: 150 },
   { id: '🐉', e: '🐉', n: 'Drachenschiff', p: 250 },
   { id: '🦄', e: '🦄', n: 'Einhorn-Gleiter', p: 350 },
-  { id: '🐳', e: '🐳', n: 'Weltraumwal', p: 500 },
-  { id: '🦖', e: '🦖', n: 'T-Rex-Kreuzer', p: 700 },
-  { id: '🌠', e: '🌠', n: 'Sternschnuppe', p: 1000 },
+  { id: '🐳', e: '🐳', n: 'Weltraumwal', p: 800 },
+  { id: '🦖', e: '🦖', n: 'T-Rex-Kreuzer', p: 1200 },
+  { id: '🌠', e: '🌠', n: 'Sternschnuppe', p: 2000 },
   { id: '☄️', e: '☄️', n: 'Kometenreiter', gold: 7 },
 ];
 const THEMES = [
@@ -54,7 +54,6 @@ const THEMES = [
   { id: 'wald', sw: ['#0b3a2e', '#b6ff6b'], n: 'Nordlicht', p: 200 },
   { id: 'sonne', sw: ['#5a1f0b', '#ffcf3f'], n: 'Sonnensturm', p: 300 },
 ];
-const GALAXY2_MIN_LEVEL = 15;
 
 const rankIndex = (s) => RANKS.reduce((i, r, j) => (s >= r[0] ? j : i), 0);
 const today = () => localDay();
@@ -235,7 +234,7 @@ function piAdvice() {
 
 function switchGalaxy(n) {
   if (n === 1 && !state.galaxy2Ready) {
-    for (const g of GAME_LIST) setLevel(g.id, Math.max(level(g.id), GALAXY2_MIN_LEVEL));
+    for (const g of GAME_LIST) setLevel(g.id, level(g.id) + 2);
     state.galaxy2Ready = true;
   }
   state.galaxy = n;
@@ -281,14 +280,14 @@ const hudBtn = (name, label, onClick) => h('button', { type: 'button', class: 'h
 
 /* ---------- Erkundung: Sternensplitter & Schatztruhen ---------- */
 
-const SHARDS = 80;
+const SHARDS = 40;
 const CHESTS = 5;
 const OUTER = 2400; // chests lie at least this far from the station: rewards for exploring the edges
 
-/** Today's pickups for the current galaxy (same layout all day, collected ones removed). */
+/** Today's pickups (same layout all day and in both galaxies, collected ones removed). */
 function worldPickups(objects) {
   if (state.world.day !== today()) { state.world = { day: today(), taken: [] }; save(); }
-  const r = seeded(today() + ':' + state.galaxy);
+  const r = seeded(today());
   const out = [];
   const free = (x, y) => objects.every((o) => Math.hypot(o.x - x, o.y - y) > o.r + 150) && out.every((p) => Math.hypot(p.x - x, p.y - y) > 120);
   const outer = (x, y) => Math.hypot(x - WORLD_W / 2, y - WORLD_H / 2) > OUTER;
@@ -297,7 +296,7 @@ function worldPickups(objects) {
     for (let t = 0; t < 60; t++) {
       const x = 120 + r() * (WORLD_W - 240);
       const y = 120 + r() * (WORLD_H - 240);
-      if (free(x, y) && (kind === 'shard' || outer(x, y))) { out.push({ id: `${state.galaxy}:${kind}${i}`, kind, x, y }); break; }
+      if (free(x, y) && (kind === 'shard' || outer(x, y))) { out.push({ id: `${kind}${i}`, kind, x, y }); break; }
     }
   }
   return out.filter((p) => !state.world.taken.includes(p.id));
@@ -306,7 +305,7 @@ function worldPickups(objects) {
 function pickUp(p, world) {
   if (p.kind === 'chest') { openChest(p, world); return; }
   state.world.taken.push(p.id);
-  state.crystals += 2;
+  state.crystals += 1;
   sfx.tick();
   announce(track('shard'));
   refreshHud();
@@ -328,9 +327,10 @@ function openChest(p, world) {
   };
   const finish = () => {
     state.world.taken.push(p.id);
-    const gems = 30 + Math.floor(Math.random() * 31);
+    const roll = Math.random() < 0.34;
+    const egg = roll && eggsUseful();
+    const gems = 30 + Math.floor(Math.random() * 31) + (roll && !egg ? 20 : 0); // crystals instead of an egg once all hatched
     state.crystals += gems;
-    const egg = Math.random() < 0.34;
     if (egg) state.eggs = (state.eggs || 0) + 1;
     setKeyHandler(null);
     close();
@@ -537,14 +537,14 @@ function renderFinale() {
 
 /* ---------- Mission ---------- */
 
-function startMission(ids, { expedition = false, finale = false } = {}) {
-  lastMission = { ids, expedition, finale };
+function startMission(ids, { expedition = false, finale = false, duelOnly = false } = {}) {
+  lastMission = { ids, expedition, finale, duelOnly };
   let list;
-  if (finale) list = [...shuffle(STORY_PLANETS).slice(0, 4), 'duel'];
+  if (finale) list = duelOnly ? ['duel'] : [...shuffle(STORY_PLANETS).slice(0, 4), 'duel'];
   else if (expedition) list = Array.from({ length: 6 }, () => pick(ids));
   else list = Array(GAMES[ids[0]].rounds).fill(ids[0]);
   M = {
-    list, idx: 0, mistakes: 0, roundMistakes: 0, expedition, finale, flawless: {}, token: 0,
+    list, idx: 0, mistakes: 0, roundMistakes: 0, roundsWithMistakes: 0, lvlSum: 0, curL: 0, expedition, finale, flawless: {}, token: 0,
     startLevels: Object.fromEntries(list.map((id) => [id, level(id)])),
     startStages: Object.fromEntries(list.map((id) => [id, stageOf(id)])),
     startPoints: Object.fromEntries(list.map((id) => [id, points(id)])),
@@ -554,7 +554,9 @@ function startMission(ids, { expedition = false, finale = false } = {}) {
   const lvBadge = h('span', { class: 'badge' });
   const comboEl = h('span', { class: 'combo' });
   const title = h('span', { class: 'mtitle' });
-  M.ui = { stage, prog, lvBadge, title, comboEl };
+  const easier = h('button', { type: 'button', class: 'pill', title: 'Leichter machen', onClick: () => bump(-2) }, ...withIcon('turtle', 'Leichter'));
+  const harder = h('button', { type: 'button', class: 'pill turbo', title: 'Schwerer machen', onClick: () => bump(3) }, ...withIcon('zap', 'Zu leicht!'));
+  M.ui = { stage, prog, lvBadge, title, comboEl, pills: [easier, harder] };
   M.combo = 0;
   M.comboBonus = 0;
   M.enc = list.some((id) => id !== 'duel')
@@ -572,8 +574,8 @@ function startMission(ids, { expedition = false, finale = false } = {}) {
         comboEl,
         lvBadge,
         h('button', { type: 'button', class: 'icon', title: 'Tipp', 'aria-label': 'Tipp', onClick: showHint }, icon('lightbulb')),
-        h('button', { type: 'button', class: 'pill', title: 'Leichter machen', onClick: () => bump(-2) }, ...withIcon('turtle', 'Leichter')),
-        h('button', { type: 'button', class: 'pill turbo', title: 'Schwerer machen', onClick: () => bump(3) }, ...withIcon('zap', 'Zu leicht!')))),
+        easier,
+        harder)),
     M.enc?.el,
     stage);
   nextRound();
@@ -591,8 +593,9 @@ function nextRound() {
   const id = M.list[M.idx];
   const g = GAMES[id];
   const p = info(g);
-  const L = level(id);
-  M.roundMistakes = 0;
+  // the finale duel is capped so the last fight stays winnable
+  const L = M.finale && id === 'duel' ? Math.min(level(id), 20) : level(id);
+  M.curL = L;
   M.locked = false;
   const boss = M.finale && id === 'duel' ? finaleBoss() : null;
   M.ui.title.textContent = boss ? `${boss.e} ${boss.n}` : p.name;
@@ -602,6 +605,8 @@ function nextRound() {
     setChaos(M.enc.villainLife);
     M.enc.hide(id === 'duel');
   }
+  // no level buttons in duels: they would reset the fight
+  for (const b of M.ui.pills) b.hidden = g.rounds === 1;
   M.ui.lvBadge.textContent = `Stufe ${L}`;
   [...M.ui.prog.children].forEach((d, i) => { d.className = i < M.idx ? 'done' : i === M.idx ? 'now' : ''; });
   const stage = M.ui.stage;
@@ -616,7 +621,7 @@ function makeApi(g, boss) {
   const token = ++M.token;
   const mission = M;
   const alive = () => M === mission && M.token === token && !M.locked;
-  return {
+  const api = {
     ship: state.ship,
     boss,
     mods: { shield: mod('shield'), time: mod('time'), laser: mod('laser') },
@@ -628,14 +633,15 @@ function makeApi(g, boss) {
       return keypad(guarded);
     },
     setKeys: (fn) => setKeyHandler((k) => { if (alive()) fn(k); }),
-    wrong: (msg) => {
+    wrong: (msg, opts) => {
       if (!alive()) return;
       M.mistakes++;
       M.roundMistakes++;
       sfx.wrong();
       shake(M.ui.stage);
       if (msg) toast(msg, 'bad', 2400);
-      if (M.enc && g.rounds > 1) { // the boss duel has its own hearts
+      // retrying the same field still counts as a mistake but costs no extra life
+      if (M.enc && g.rounds > 1 && !opts?.repeat) { // the boss duel has its own hearts
         const left = M.enc.wrong();
         if (left <= 0) {
           M.locked = true;
@@ -649,7 +655,7 @@ function makeApi(g, boss) {
     solved: (opts = {}) => {
       if (!alive()) return;
       M.locked = true;
-      roundDone(g, opts);
+      roundDone(g, opts, api.fieldCount || 1);
     },
     failed: () => {
       if (!alive()) return;
@@ -657,6 +663,7 @@ function makeApi(g, boss) {
       later(() => (M.finale ? finaleResult(0) : bossResult(g, 0)), 1200);
     },
   };
+  return api;
 }
 
 /** setTimeout that only fires if the same mission is still running (not aborted/replaced). */
@@ -665,7 +672,8 @@ function later(fn, ms) {
   setTimeout(() => { if (M && M === mission) fn(); }, ms);
 }
 
-function roundDone(g, opts) {
+function roundDone(g, opts, fieldCount = 1) {
+  state.stats.maxPlayedL = Math.max(state.stats.maxPlayedL || 0, M.curL);
   sfx.right();
   confetti(45);
   toast(opts.msg || pick(PRAISE), 'good', opts.msg ? 2600 : 1400);
@@ -681,11 +689,12 @@ function roundDone(g, opts) {
   }
   if (M.enc && g.rounds > 1) {
     M.enc.solved();
+    M.enc.heal(Math.max(1, Math.ceil(fieldCount / 4)));
     setRepair((M.idx + 1) / M.list.length);
     setChaos(M.enc.villainLife);
     if (M.combo >= 3) {
       const n = M.combo;
-      setTimeout(() => M?.enc?.taunt(pick([`Was?! ${n} hintereinander?!`, 'Hör auf, so schlau zu sein!', 'Das ist doch nicht normal!'])), 2300);
+      later(() => M.enc.taunt(pick([`Was?! ${n} hintereinander?!`, 'Hör auf, so schlau zu sein!', 'Das ist doch nicht normal!'])), 2300);
     }
     if (!M.finale && M.idx === M.list.length - 1) setTimeout(() => M?.enc?.finish(), 700);
   }
@@ -693,21 +702,24 @@ function roundDone(g, opts) {
     later(() => (M.finale ? finaleResult(opts.stars ?? 1) : bossResult(g, opts.stars ?? 1)), 1500);
     return;
   }
+  M.lvlSum += M.curL;
+  if (M.roundMistakes > 0) M.roundsWithMistakes++;
   if (!M.finale) addPoints(g.id, M.roundMistakes === 0 ? 2 : 1);
-  // Adaptive Schwierigkeit: zwei fehlerfreie Rätsel in Folge → eine Stufe höher.
+  // Adaptive Schwierigkeit: drei fehlerfreie Rätsel in Folge → eine Stufe höher.
   if (M.roundMistakes === 0) {
     M.flawless[g.id] = (M.flawless[g.id] || 0) + 1;
-    if (M.flawless[g.id] >= 2) {
+    if (M.flawless[g.id] >= 3) {
       M.flawless[g.id] = 0;
       setLevel(g.id, level(g.id) + 1);
       later(() => piSay(`Stark! Das war dir zu leicht – ${info(g).name} ist jetzt Stufe ${level(g.id)}.`, 3500), 1200);
     }
   } else {
     M.flawless[g.id] = 0;
-    if (M.roundMistakes >= 3) setLevel(g.id, level(g.id) - 1);
+    if (M.roundMistakes >= 2) setLevel(g.id, level(g.id) - 1);
   }
   save();
   later(() => {
+    M.roundMistakes = 0;
     M.idx++;
     if (M.idx >= M.list.length) finishMission();
     else nextRound();
@@ -717,6 +729,7 @@ function roundDone(g, opts) {
 function bump(d) {
   if (!M || M.locked) return;
   const id = M.list[M.idx];
+  if (GAMES[id].rounds === 1) return;
   setLevel(id, level(id) + d);
   sfx.tick();
   toast(d > 0 ? `Schwieriger: Stufe ${level(id)}` : `Leichter: Stufe ${level(id)}`);
@@ -747,27 +760,35 @@ function updateStreak() {
   state.lastDay = t;
 }
 
-function award(stars, crystals) {
+/** stars: shown result; starCap limits what goes onto the star counter (boss fights). */
+function award(stars, crystals, starCap = stars) {
   const prevStars = state.stars;
   const prevRank = rankIndex(prevStars);
-  state.stars += stars;
+  state.stars += Math.min(stars, starCap);
   state.crystals += crystals;
   state.missions++;
   updateStreak();
-  if (!state.cometReady && Math.random() < 0.35) state.cometReady = true;
+  if (stars > 0 && !state.cometReady && Math.random() < 0.35) state.cometReady = true;
   let hatched = null;
+  let eggGems = 0;
   if (stars > 0) {
-    state.eggs = (state.eggs || 0) + 1;
     const free = CREATURES.filter((c) => !c.comet && !state.creatures.includes(c.id));
-    if (state.eggs >= 2 && free.length) {
-      state.eggs -= 2;
-      hatched = pick(free);
-      state.creatures.push(hatched.id);
+    if (!free.length) {
+      eggGems = 20; // nothing left to hatch: crystals instead of an egg
+      state.crystals += eggGems;
+    } else {
+      state.eggs = (state.eggs || 0) + 1;
+      if (state.eggs >= 2) {
+        state.eggs -= 2;
+        hatched = pick(free);
+        state.creatures.push(hatched.id);
+      }
     }
   }
   save();
   const result = {
     hatched,
+    eggGems,
     rankUp: rankIndex(state.stars) > prevRank ? RANKS[rankIndex(state.stars)][1] : null,
     unlocked: state.galaxy === 0 ? GAME_LIST.filter((g) => g.unlock > prevStars && g.unlock <= state.stars) : [],
   };
@@ -777,11 +798,10 @@ function award(stars, crystals) {
 
 function finishMission() {
   const ids = [...new Set(M.list)];
-  const stars = M.mistakes === 0 ? 3 : M.mistakes <= 2 ? 2 : 1;
-  if (M.mistakes === 0) ids.forEach((id) => setLevel(id, level(id) + 1));
-  const avgL = M.list.reduce((s, id) => s + M.startLevels[id], 0) / M.list.length;
+  const stars = M.roundsWithMistakes === 0 ? 3 : M.roundsWithMistakes <= 2 ? 2 : 1;
+  const avgL = M.lvlSum / M.list.length; // pay for the levels actually played
   const comboBonus = M.comboBonus;
-  const crystals = Math.round(M.list.length * (3 + avgL) * (1 + (stars - 1) * 0.25) * (M.expedition ? 1.5 : 1)) + comboBonus;
+  const crystals = Math.round(M.list.length * (8 + avgL / 2) * (1 + (stars - 1) * 0.25) * (M.expedition ? 1.5 : 1)) + comboBonus;
   const changes = ids.map((id) => [info(GAMES[id]), M.startLevels[id], level(id)]);
   const storyIds = ids.filter((id) => STORY_PLANETS.includes(id));
   const rescue = storyIds.map((id) => [info(GAMES[id]), M.startPoints[id], points(id)]);
@@ -804,16 +824,17 @@ function missionLost() {
   setLevel(id, L0 - 1);
   const crystals = 3 * M.idx; // small consolation for the puzzles that were solved
   state.crystals += crystals;
+  updateStreak();
   save();
   renderResult({ win: false, lost: true, stars: 0, crystals, changes: [[info(GAMES[id]), L0, level(id)]], unlocked: [] });
 }
 
 function bossResult(g, stars) {
-  const L0 = M.startLevels[g.id];
-  setLevel(g.id, level(g.id) + (stars === 3 ? 2 : stars > 0 ? 1 : -1));
-  const crystals = stars ? Math.round((20 + L0 * 4) * (1 + (stars - 1) * 0.25)) : 5;
+  const L0 = level(g.id);
+  setLevel(g.id, L0 + (stars === 3 ? 1 : stars > 0 ? 0 : -1));
+  const crystals = stars ? Math.round((10 + M.curL * 2) * (1 + (stars - 1) * 0.25)) : 5;
   if (stars > 0) announce(track('boss'));
-  const extra = award(stars, crystals);
+  const extra = award(stars, crystals, 1);
   renderResult({ win: stars > 0, stars, crystals, changes: [[info(g), L0, level(g.id)]], boss: true, ...extra });
 }
 
@@ -825,15 +846,17 @@ function finaleResult(stars) {
     if (gal === 0) state.maxGalaxy = Math.max(state.maxGalaxy, 1);
     setLevel('duel', level('duel') + 1);
   }
-  const crystals = stars ? 150 + 50 * stars : 10;
+  // full reward only for the first victory per galaxy; replays pay less and add at most 1 star
+  const crystals = stars ? (first ? 150 + 50 * stars : 40 + 10 * stars) : 10;
   if (stars > 0) announce(track('boss'));
-  const extra = award(stars, crystals);
+  const extra = award(stars, crystals, first ? stars : 1);
   if (stars > 0) {
     renderCredits(stars, crystals);
     if (first) playScenes([{ kind: 'ending' }]);
     return;
   }
   setLevel('duel', level('duel') - 1);
+  lastMission = { ids: [], finale: true, duelOnly: true }; // retry only the final duel
   renderResult({ win: false, stars: 0, crystals, changes: [], boss: true, finale: true, ...extra });
 }
 
@@ -862,6 +885,7 @@ function renderResult(r) {
       r.lost ? h('p', {}, 'Deine Lebensenergie ist leer.') : null,
       r.crystals ? h('p', { class: 'earn' }, `+${r.crystals} `, icon('gem')) : null,
       r.comboBonus ? h('p', { class: 'muted' }, `davon Combo-Bonus: +${r.comboBonus} `, icon('gem')) : null,
+      r.eggGems ? h('p', { class: 'muted' }, `Alle Zahlenwesen sind geschlüpft – statt eines Eis: +${r.eggGems} `, icon('gem')) : null,
       h('ul', { class: 'changes' }, changeLines, rescueLines),
       r.waiting ? h('button', { type: 'button', class: 'btn danger pulse', onClick: () => openDecoder(r.waiting) }, ...withIcon('mail', `Botschaft auf ${info(r.waiting).name} entschlüsseln`)) : null,
       r.win && !r.boss ? h('div', { class: 'callout' }, `${encounterVillain().e} ${encounterVillain().n} ist geflohen!`) : null,
@@ -872,7 +896,7 @@ function renderResult(r) {
         : (eggCreaturesLeft && r.stars > 0 ? h('p', { class: 'muted' }, ...withIcon('egg', `Noch ${eggsLeft} Mission${eggsLeft === 1 ? '' : 'en'} bis zum nächsten Zahlenwesen`)) : null),
       h('div', { class: 'row' },
         backBtn('Abheben'),
-        h('button', { type: 'button', class: 'btn primary big', onClick: () => startMission(lastMission.ids, lastMission) }, ...(r.win ? withIcon('play', 'Nächste Mission') : withIcon('rotate-ccw', 'Nochmal versuchen'))))));
+        h('button', { type: 'button', class: 'btn primary big', onClick: () => startMission(lastMission.ids, lastMission) }, ...(r.win ? withIcon('play', 'Nächste Mission') : withIcon('rotate-ccw', lastMission.duelOnly ? 'Endkampf wiederholen' : 'Nochmal versuchen'))))));
   if (r.hatched) setTimeout(() => sfx.hatch(), 900);
   if (r.scenes?.length) {
     const panel = app.querySelector('.result');
@@ -957,7 +981,7 @@ function cometSolved() {
   state.goldStars = (state.goldStars || 0) + 1;
   state.crystals += 30;
   state.cometReady = false;
-  state.cometLevel = Math.min(MAX_LEVEL, cometLevel() + (c.hintIdx ? 1 : 2));
+  state.cometLevel = Math.min(MAX_LEVEL, cometLevel() + (c.hintIdx === 0 ? 2 : c.hintIdx < c.hints.length ? 1 : 0));
   const gained = COMET_REWARDS.filter((r) => r.gold === state.goldStars);
   for (const r of gained) {
     if (r.creature && !state.creatures.includes(r.creature)) state.creatures.push(r.creature);

@@ -48,9 +48,11 @@ export function fieldInput(api, fields, { maxLen = 5, onDone } = {}) {
     active = f;
     f.el.classList.add('active');
   };
+  api.fieldCount = fields.length;
   for (const f of fields) {
     f.val = '';
     f.done = false;
+    f.missed = false;
     f.el.classList.add('field');
     show(f);
     f.el.addEventListener('click', () => { sfx.click(); select(f); });
@@ -76,7 +78,8 @@ export function fieldInput(api, fields, { maxLen = 5, onDone } = {}) {
         shake(f.el);
         f.el.classList.add('bad');
         setTimeout(() => f.el.classList.remove('bad'), 500);
-        api.wrong(f.wrongMsg?.(v));
+        api.wrong(f.wrongMsg?.(v), { repeat: f.missed });
+        f.missed = true;
         f.val = '';
       }
     } else if (f.val.length < maxLen) f.val = (f.val === '0' ? '' : f.val) + k;

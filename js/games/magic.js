@@ -40,11 +40,12 @@ export default {
     let g = [...LOSHU];
     for (let i = rnd(0, 3); i > 0; i--) g = rot(g);
     if (Math.random() < 0.5) g = flip(g);
-    const [k, c] = L <= 5 ? [1, 0] : L <= 10 ? [1, rnd(1, 10)] : L <= 16 ? [rnd(1, 3), rnd(0, 20)] : [rnd(2, 6), rnd(5, 50)];
+    const [k, c] = L <= 3 ? [1, 0] : L <= 8 ? [1, rnd(1, 10)] : L <= 14 ? [rnd(1, 3), rnd(0, 20)]
+      : L <= 22 ? [rnd(2, 4), rnd(5, 30)] : [rnd(2, 6), rnd(5, 50)];
     g = g.map((v) => v * k + c);
     const S = 15 * k + 3 * c;
     const showSum = L < 12;
-    const target = L <= 1 ? 2 : L <= 3 ? 3 : L <= 8 ? 4 : L <= 15 ? 5 : 6;
+    const target = L <= 1 ? 2 : L <= 3 ? 3 : L <= 8 ? 4 : 5;
 
     const hidden = new Set();
     for (const i of shuffle([...Array(9).keys()])) {
