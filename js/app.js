@@ -155,7 +155,7 @@ function renderWelcome() {
   let avatar = state.avatar;
   let grade = GRADES[1];
   const nameIn = h('input', { type: 'text', maxlength: 16, placeholder: 'Dein Name', value: state.name, 'aria-label': 'Dein Name' });
-  const avatarRow = h('div', { class: 'choice-row' }, AVATARS.map((a) => h('button', {
+  const avatarRow = h('div', { class: 'choice-row avatar-grid' }, AVATARS.map((a) => h('button', {
     type: 'button', class: 'choice' + (a === avatar ? ' sel' : ''),
     onClick: (e) => { avatar = a; sfx.click(); avatarRow.querySelectorAll('.choice').forEach((b) => b.classList.toggle('sel', b === e.currentTarget)); },
   }, a)));

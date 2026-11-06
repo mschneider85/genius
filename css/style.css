@@ -130,8 +130,15 @@ input[type='text'] {
   background: rgba(0, 0, 0, 0.3); color: var(--text); width: 100%; max-width: 360px;
 }
 .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.choice { border: 2px solid transparent; background: var(--card); border-radius: 14px; font-size: 1.8rem; width: 56px; height: 56px; }
-.choice.wide { width: auto; height: auto; font-size: 1rem; font-weight: 800; padding: 0.7em 1em; }
+/* padding 0 + grid-Zentrierung: Safari gibt Buttons sonst Standard-Innenabstand, der Emojis aus der Mitte schiebt */
+.choice {
+  border: 2px solid transparent; background: var(--card); border-radius: 14px; font-size: 1.8rem; width: 56px; height: 56px;
+  padding: 0; display: inline-grid; place-items: center; line-height: 1; text-align: center; flex: none;
+}
+.choice.wide { display: inline-block; width: auto; height: auto; font-size: 1rem; font-weight: 800; padding: 0.7em 1em; }
+/* 12 Avatare: 2 gleichmäßige Reihen à 6 (Handy: 3 à 4) statt einer zerrissenen Reihe */
+.avatar-grid { display: grid; grid-template-columns: repeat(6, 56px); gap: 10px; }
+@media (max-width: 480px) { .avatar-grid { grid-template-columns: repeat(4, 56px); } }
 .choice.sel { border-color: var(--accent); background: var(--card2); box-shadow: 0 0 14px var(--accent-glow); }
 .welcome .btn.big { display: block; margin: 26px auto 0; }
 
